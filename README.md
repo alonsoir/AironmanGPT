@@ -1,4 +1,4 @@
-![Descripción de la imagen](https://i.imgur.com/bYW6pai.jpg)
+![](https://imgur.com/a/8TBJ0SZ)https://imgur.com/a/8TBJ0SZ
 # Installation Guide for AironmanGPT Project
 
 AironmanGPT also known as Jarvis is an artificial intelligence assistant based on the initial work from @luijait 
