@@ -68,8 +68,12 @@ Este comando realiza una exploración rápida y completa de la red, identificand
 
  sugerencias:
 
+ Estas dos si necesitan sudo
  1) nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN "$PATH_TO/file_Reconnaissance.nmap" --open --version-trace --top-talked 1000
  --script-timeout 10000 $TARGET_IP_RANGE
 
  2) nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN "$PATH_TO/file_Reconnaissance.nmap" --open --version-trace --top-talked 1000
  --script-timeout 10000 --script-args '| nmap -p- -sV -sC --top-ports 1000 --top-talked 1000 --script-trace' $TARGET_IP_RANGE
+
+ Esta no necesita sudo
+ 3) nmap -T4 -sT -sV -sC --top-ports 1000 -oN {file_to} --open --version-trace --script-timeout 10000 {TARGET_IP_RANGE}
