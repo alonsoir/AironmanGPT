@@ -2,6 +2,7 @@
 import os
 from DarkAgent import DarkGPT
 from cli import ConversationalShell
+from tools.nmap_recognition import NmapTool
 
 # Banner de inicio para la aplicación, mostrando un diseño ASCII con el creador
 banner = """

@@ -1,0 +1,75 @@
+Nmap es un programa de escaneo de seguridad de redes que se utiliza para identificar y mapear dispositivos en una red. En las diferentes fases de OSINT, Nmap puede utilizarse de la siguiente manera:
+
+Reconocimiento: En esta fase, el agente debería utilizar Nmap para identificar y mapear los dispositivos en la red. Esto incluye el escaneo de puertos, el análisis de versiones de servicios y el reconocimiento de sistemas operativos. El agente debería ejecutar Nmap en diferentes modos de escaneo, como el modo de descubrimiento rápido, el modo de escaneo completo y el modo de escaneo de puertos específicos, para obtener una visión general de la red y sus dispositivos.
+Análisis: Una vez que se ha identificado la red y sus dispositivos, el agente debería utilizar Nmap para analizar los resultados del escaneo. Esto incluye el análisis de versiones de servicios y sistemas operativos, la búsqueda de vulnerabilidades conocidas y la identificación de servicios no estándar. El agente también debería utilizar herramientas de análisis adicionales, como Nessus o Metasploit, para obtener más información sobre las vulnerabilidades identificadas.
+Explotación: En esta fase, el agente debería utilizar Nmap para explotar las vulnerabilidades identificadas en los dispositivos de la red. Esto puede incluir la ejecución de ataques de fuerza bruta, la ejecución de ataques de inyección de código
+
+Nmap es un programa de escaneo de seguridad informática que se utiliza para identificar y mapear recursos de redes informáticas. En las diferentes fases de OSINT (Obtención de Información de Fuentes Abiertas), Nmap puede ser utilizado de la siguiente manera:
+
+Reconocimiento básico de la red: En esta fase, Nmap se utiliza para identificar los dispositivos conectados a la red y sus características básicas, como su dirección IP, puerto escucha y estado de servicio. Esto se puede hacer mediante el escaneo de direcciones IP o de rango de direcciones.
+Escaneo de servicios: Una vez identificados los dispositivos en la red, Nmap se utiliza para escanear los puertos de cada dispositivo y determinar qué servicios están corriendo en cada uno de ellos. Esto incluye servicios como HTTP, FTP, SSH, SMB y muchos más.
+Escaneo de versiones: Una vez identificados los servicios, Nmap se utiliza para determinar las versiones de estos servicios que están corriendo en cada dispositivo. Esto es importante para identificar vulnerabilidades conocidas en las versiones más antiguas de estos servicios.
+Escaneo de configuraciones: Nmap también puede identificar configuraciones de seguridad inseguras en algunos servicios, como puertos abiertos en la red o configuraciones de usuario y contraseña inseguras en servicios como SSH o FTP.
+Escaneo de redes adyacentes: Si la red que estás escaneando está conectada a otras redes, Nmap puede identificar las redes adyacentes y sus dispositivos. Esto es útil para identificar posibles vías de ataque a través de redes externas.
+
+Escaneo de puertos de escucha en el puerto 139: Nmap también puede identificar dispositivos que estén escuchando en el puerto 139 de la red, lo que indica que pueden estar corriendo servicios de red local como SMB. Esto es importante para identificar dispositivos que pueden estar vulnerables a ataques de red local.
+
+Escaneo de puertos de escucha en el puerto 445: Nmap también puede identificar dispositivos que estén escuchando en el puerto 445 de la red, lo que indica que pueden estar corriendo servicios de red local como SMB. Esto es importante para identificar dispositivos que pueden estar vulnerables a ataques de red local.
+
+Escaneo de puertos de escucha en el puerto 3389: Nmap también puede identificar dispositivos que estén escuchando en el puerto 3389 de la red, lo que indica que pueden estar corriendo servicios de red local como SMB. Esto es importante para identificar dispositivos que pueden estar vulnerables a ataques de red local.
+
+Escaneo de puertos de escucha en el puerto 445: Nmap también puede identificar dispositivos que estén escuchando en el puerto 445 de la red, lo que indica que pueden estar corriendo servicios de red local como SMB. Esto es importante para identificar dispositivos que pueden estar vulnerables a ataques de red local.
+
+
+dame un comando nmap que cumpla con todos estos requisitos: Reconnaissance: In this phase, "
+                       "the agent should use Nmap to identify and map devices on the network. "
+                       "This includes port scanning, service version analysis, and operating system recognition. "
+                       "The agent should run Nmap in different scanning modes, such as quick discovery mode, "
+                       "full scan mode, and specific port scan mode, "
+                       "to get an overview of the network and its devices.
+
+nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN /path/to/output/file.nmap --open --version-trace --top-talked 1000 /target/network/ip
+
+ Para cumplir con todos estos requisitos, puedes usar el siguiente comando nmap:
+```
+nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN /path/to/output/file.nmap --open --version-trace --top-talked 1000 /target/network/ip
+```
+Este comando realiza una exploración rápida y completa de la red, identificando y mapeando dispositivos en la red. Los parámetros utilizados son los siguientes:
+- `-T4`: Esta es la velocidad de exploración más alta disponible en nmap. Especifica que se debe utilizar el modo de búsqueda rápida.
+- `-sS`: Esta opción realiza un escaneo de puertos estándar, que es el modo más rápido de escaneo de puertos.
+- `-sV`: Esta opción realiza un escaneo de servicios, que identifica los servicios que se ejecutan en los puertos escaneados.
+- `-sC`: Esta opción realiza un escaneo de versículos, que identifica las versiones de los servicios que se ejecutan en los puertos escaneados.
+- `-p-`: Esta opción escanea todos los puertos en el rango 1-65535.
+- `--top-ports 1000`: Esta opción limita el número de puertos que se escanean a los primeros 1000.
+- `-oN /path/to/output/file.nmap`: Esta opción escribe los resultados de la exploración en un archivo de salida en formato Nmap.
+- `--open`: Esta opción muestra los puertos abiertos y sus servicios asociados.
+- `--version-trace`: Esta opción muestra la versión de los servicios identificados.
+- `--top-talked 1000`: Esta opción muestra los puertos más hablados en la red.
+- `/target/network/ip`: Esta es la dirección IP del objetivo de la exploración.
+
+ nmap -sS -sV -sT -p 1-10000 192.168.1.0/24
+
+ dados los siguientes ejemplos de comandos nmap para cumplir con todos estos requisitos:
+
+ Reconnaissance: In this phase, "
+                       "the agent should use Nmap to identify and map devices on the network. "
+                       "This includes port scanning, service version analysis, and operating system recognition. "
+                       "The agent should run Nmap in different scanning modes, such as quick discovery mode, "
+                       "full scan mode, and specific port scan mode, "
+                       "to get an overview of the network and its devices.
+
+
+ Cuales de estos ejemplos es el más completo y el que mas se acerca a los requisitos? Propón un comando nmap aún mejor
+ que cumpla con todos estos requisitos.
+
+ nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN /path/to/output/file.nmap --open --version-trace --top-talked 1000 192.168.1.0/24
+
+ nmap -sS -sV -sT -p 1-10000 192.168.1.0/24
+
+ sugerencias:
+
+ 1) nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN "$PATH_TO/file_Reconnaissance.nmap" --open --version-trace --top-talked 1000
+ --script-timeout 10000 $TARGET_IP_RANGE
+
+ 2) nmap -T4 -sS -sV -sC -p- --top-ports 1000 -oN "$PATH_TO/file_Reconnaissance.nmap" --open --version-trace --top-talked 1000
+ --script-timeout 10000 --script-args '| nmap -p- -sV -sC --top-ports 1000 --top-talked 1000 --script-trace' $TARGET_IP_RANGE
