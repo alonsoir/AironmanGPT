@@ -1,11 +1,9 @@
 # Importación de módulos necesarios
-import os
 from DarkAgent import DarkGPT
 from cli import ConversationalShell
-from tools.nmap_recognition import NmapTool
 
 # Banner de inicio para la aplicación, mostrando un diseño ASCII con el creador
-banner = """
+banner = r"""
      _   _    ______     _____ ____  
     | | / \  |  _ \ \   / /_ _/ ___| 
  _  | |/ _ \ | |_) \ \ / / | |\___ \ 

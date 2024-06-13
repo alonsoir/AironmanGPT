@@ -24,7 +24,7 @@ class ConversationalShell:
             "Welcome to Jarvis an experiment to try to demonstrate the use of different specific tools as autonomous "
             "Langchain agents for pentesting. \n"
             "Type 'exit' to finish, 'clear' to clear the screen.\n"
-            "Introduce the target you want to attack, and Jarvis will try to find the right tool for you."
+            "Introduce the target you want to scan, and Jarvis will try to find the right tool for you."
         )
 
         try:

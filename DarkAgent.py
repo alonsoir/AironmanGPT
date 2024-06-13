@@ -1,18 +1,13 @@
+import json
+import os
+import subprocess
 import sys
 
-from langchain_core.messages import HumanMessage
-from langchain_core.utils.function_calling import convert_to_openai_function
-from openai import Client
-import os
-from dehashed_api import consultar_dominio_dehashed
-import json
-from functions import Leak_Function, Target_Identification_Reconnaissance
 from dotenv import load_dotenv
-import subprocess
-
-from tools import nmap_recognition
-from tools.nmap_recognition import NmapTool
+from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
+
+from tools.nmap_recognition import NmapTool
 
 load_dotenv()
 
@@ -31,7 +26,7 @@ Identificación del objetivo: Nmap
 Reconocimiento: Nmap, Netdiscover
 Enumeración de puertos: Nmap, Netdiscover
 Escaneo de vulnerabilidades: Nmap, OpenVAS, Metasploit, Nessus
-Exploitación de vulnerabilidades: Metasploit, Cobalt Strike
+Explotación de vulnerabilidades: Metasploit, Cobalt Strike
 Escalado de privilegios: Metasploit, Cobalt Strike
 Reconocimiento de sistema: Nmap, Netdiscover, Nessus, OpenVAS
 Análisis de actividad: Sysmon, Splunk, ELK
@@ -132,7 +127,13 @@ class DarkGPT:
         # Genera una respuesta determinista para la llamada a función.
         functions_prompts = mensajes(message)
         query = f"Utiliza NmapTool para escanear el dominio {functions_prompts[1].get('content')}"
-        response = self.model.invoke(query)
+        print(query)
+        TARGET_IP_RANGE = functions_prompts[1].get("content")
+        file_to="./tools/file_Reconnaissance.nmap"
+        command = f"nmap -T4 -sT -sV -sC --top-ports 1000 -oN {file_to} --open --version-trace --script-timeout 10000 {TARGET_IP_RANGE}"
+        print(f"Running {command}\n")
+        print("Be patient please...\n")
+        dispatch_tool_output = self.dispatch_tool("bash", command)
         """
         response = self.openai_client.chat.completions.create(
             model="gpt-4",
@@ -142,8 +143,8 @@ class DarkGPT:
         )
         """
         # Procesamiento previo de la salida para convertirla de JSON a un formato manejable.
-        processed_output = response.content
-        print(processed_output)# Procesamiento de la salida utilizando la función personalizada consultar_dominio_dehashed.
+        processed_output = dispatch_tool_output
+        # Procesamiento de la salida utilizando la función personalizada consultar_dominio_dehashed.
         # Luego se debería tratar de convertir la salida de la función en un formato más legible para el siguiente paso de
         # la conversación.
         return str(processed_output)
@@ -184,9 +185,7 @@ class DarkGPT:
 
         historial_json = self.process_history_with_function_output(historial, function_output)
 
-        message = self.model.invoke(
-            [HumanMessage(content=historial_json)]
-        )
+        message = self.model.invoke([HumanMessage(content=historial_json[0]['content'])])
         # Genera una respuesta del modelo.
         """
         respuesta = self.openai_client.chat.completions.create(
@@ -199,7 +198,7 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                print(chunk.choices[0].delta.content or "\n", end="")
+                print(chunk[1])
             except:
                 pass  # Ignora los errores en el procesamiento de fragmentos.
 
