@@ -1,0 +1,163 @@
+/Users/aironman/git/AironmanGPT/venv/bin/python /Users/aironman/git/AironmanGPT/main.py
+
+     _   _    ______     _____ ____
+    | | / \  |  _ \ \   / /_ _/ ___|
+ _  | |/ _ \ | |_) \ \ / / | |\___ \
+| |_| / ___ \|  _ < \ V /  | | ___) |
+ \___/_/   \_\_| \_\ \_/  |___|____/
+
+hecho por: @alonso_isidoro
+
+Welcome to Jarvis an experiment to try to demonstrate the use of different specific tools as autonomous Langchain agents for pentesting.
+Type 'exit' to finish, 'clear' to clear the screen.
+Introduce the target you want to scan, and Jarvis will try to find the right tool for you.
+> localhost
+Utiliza NmapTool para escanear el dominio localhost
+Iniciando capture_then_dispatch_nmap_reconnaissance...
+Capturing on 'Wi-Fi: en0'
+Running nmap -T4 -sT -sV -sC --top-ports 1000 -oN ./tools/file_nmap_reconnaissance.nmap --open --version-trace --script-timeout 10000 localhost
+
+Be patient please...
+
+Function run_bash_command took 24.8238 seconds to execute.
+Function dispatch_tool took 24.8241 seconds to execute.
+Deteniendo captura de tráfico en tiempo real...
+Captura de tráfico en tiempo real detenida. Archivo guardado como ./tools/file_wireshark_dispatch_nmap_reconnaissance.pcap
+Function capture_then_dispatch_nmap_reconnaissance took 59.8320 seconds to execute.
+Function execute_function_call_recoinassance took 59.8321 seconds to execute.
+Function process_history_with_function_output took 0.0001 seconds to execute.
+33859 packets captured
+RECONOCIMIENTO
+Comenzando con la identificación del objetivo utilizando Nmap 7.95. Se ha realizado un escaneo de puertos en el host 127.0.0.1 y se han encontrado los siguientes resultados:
+
+- Puerto 53/tcp abierto con el servicio de dominio (DNS) y una respuesta genérica de DNS: SERVFAIL.
+- Puerto 8021/tcp abierto pero con el servicio no reconocido, posiblemente envuelto en TCP.
+
+Se ha realizado un escaneo exhaustivo en busca de información relevante sobre los servicios y versiones en los puertos abiertos. Se ha detectado que el puerto 53/tcp corresponde al servicio de dominio con una respuesta genérica de DNS. Por otro lado, el puerto 8021/tcp no ha sido reconocido y se encuentra envuelto en TCP.
+
+Continuaré con el reconocimiento utilizando Netdiscover para obtener más información sobre la red y los dispositivos conectados. Una vez recopilada esta información, procederé con la enumeración de puertos para identificar posibles vulnerabilidades.
+
+¿Deseas continuar con este proceso o prefieres detenerlo en este punto?
+{}
+{'token_usage': {'completion_tokens': 255, 'prompt_tokens': 2128, 'total_tokens': 2383}, 'model_name': 'gpt-3.5-turbo', 'system_fingerprint': None, 'finish_reason': 'stop', 'logprobs': None}
+ai
+None
+run-e969d444-250d-47e4-a16d-6aa2291f885f-0
+False
+[]
+[]
+{'input_tokens': 2128, 'output_tokens': 255, 'total_tokens': 2383}
+Function process_nmap_recoinassance took 64.2026 seconds to execute.
+Utiliza NmapTool para escanear el dominio localhost
+Iniciando capture_then_dispatch_nmap_ports_services_vulnerabilities...
+Capturing on 'Wi-Fi: en0'
+Running nmap -sT -sV --script vuln -T4 -p- localhost -oN file_ports_services_vulnerabilities.nmap
+
+Be patient please...
+
+Function run_bash_command took 540.8626 seconds to execute.
+Function dispatch_tool took 540.8628 seconds to execute.
+Deteniendo captura de tráfico en tiempo real...
+Captura de tráfico en tiempo real detenida. Archivo guardado como ./tools/file_wireshark_dispatch_nmap_ports_services_vulnerabilities.pcap
+Function capture_then_dispatch_nmap_ports_services_vulnerabilities took 575.8753 seconds to execute.
+Function execute_function_call_nmap_ports_services_vulnerabilities took 575.8753 seconds to execute.
+Function process_history_with_function_output took 0.0001 seconds to execute.
+98831 packets captured
+PORTS_SERVICES_VULNERABILITIES
+Starting Nmap 7.95 ( https://nmap.org ) at 2024-06-14 14:22 CEST
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000082s latency).
+Other addresses for localhost (not scanned): ::1
+Not shown: 65528 closed tcp ports (conn-refused)
+PORT      STATE    SERVICE        VERSION
+53/tcp    open     domain         (generic dns response: SERVFAIL)
+8021/tcp  open     tcpwrapped
+8698/tcp  open     http           Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+| http-slowloris-check:
+|   VULNERABLE:
+|   Slowloris DOS attack
+|     State: LIKELY VULNERABLE
+|     IDs:  CVE:CVE-2007-6750
+|       Slowloris tries to keep many connections to the target web server open and hold
+|       them open as long as possible.  It accomplishes this by opening connections to
+|       the target web server and sending a partial request. By doing so, it starves
+|       the http server's resources causing Denial Of Service.
+|
+|     Disclosure date: 2009-09-17
+|     References:
+|       http://ha.ckers.org/slowloris/
+|_      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-6750
+49182/tcp open     bandwidth-test MikroTik bandwidth-test server
+49317/tcp open     unknown
+57250/tcp filtered unknown
+63342/tcp open     http           PyCharm 2024.1
+| vulners:
+|   cpe:/a:jetbrains:pycharm:2024.1:
+|     \tCVE-2024-37051\t9.3\thttps://vulners.com/cve/CVE-2024-37051
+|     \t806E2047-C153-548D-954E-A8ED13059DD5\t9.3\thttps://vulners.com/githubexploit/806E2047-C153-548D-954E-A8ED13059DD5\t*EXPLOIT*
+|_    \t6A3E5E9A-8C7C-524F-BB63-EDBA4EF46CA5\t9.3\thttps://vulners.com/githubexploit/6A3E5E9A-8C7C-524F-BB63-EDBA4EF46CA5\t*EXPLOIT*
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+
+En este escaneo realizado con Nmap, se han encontrado algunas vulnerabilidades en los servicios que se están ejecutando en el sistema.
+
+1. El puerto 8021/tcp está abierto y se ha identificado como un servidor Golang net/http que puede ser vulnerable a un ataque de Slowloris DOS. Este tipo de ataque intenta mantener muchas conexiones abiertas al servidor web objetivo y mantenerlas abiertas el mayor tiempo posible, lo que puede causar una denegación de servicio.
+
+2. Además, se ha encontrado que el puerto 63342/tcp está abierto y ejecutando PyCharm 2024.1, con una vulnerabilidad identificada como CVE-2024-37051. Esta vulnerabilidad tiene un nivel de riesgo de 9.3 y se puede encontrar más información al respecto en el enlace proporcionado.
+
+Es importante abordar estas vulnerabilidades para garantizar la seguridad del sistema. Se recomienda tomar medidas para mitigar los riesgos asociados a estas vulnerabilidades lo antes posible.
+{}
+{'token_usage': {'completion_tokens': 839, 'prompt_tokens': 2275, 'total_tokens': 3114}, 'model_name': 'gpt-3.5-turbo', 'system_fingerprint': None, 'finish_reason': 'stop', 'logprobs': None}
+ai
+None
+run-ced16e41-c19a-4117-b90f-1377402f202d-0
+False
+[]
+[]
+{'input_tokens': 2275, 'output_tokens': 839, 'total_tokens': 3114}
+Function process_nmap_ports_services_vulnerabilities took 588.5354 seconds to execute.
+Utiliza NmapTool para escanear el dominio localhost
+Iniciando capture_then_dispatch_nmap_ports_systems_services...
+Capturing on 'Wi-Fi: en0'
+Running nmap -sT -T4 -p- localhost -oN ./tools/file_nmap_ports_systems_services.nmap
+
+Be patient please...
+
+Function run_bash_command took 2.0686 seconds to execute.
+Function dispatch_tool took 2.0686 seconds to execute.
+299 packets captured
+Deteniendo captura de tráfico en tiempo real...
+Captura de tráfico en tiempo real detenida. Archivo guardado como ./tools/file_wireshark_dispatch_nmap_ports_systems_services.pcap
+Function capture_then_dispatch_nmap_ports_systems_services took 37.0838 seconds to execute.
+Function execute_function_call_nmap_ports_systems_services took 37.0839 seconds to execute.
+Function process_history_with_function_output took 0.0001 seconds to execute.
+PORTS_SYSTEMS_SERVICES
+Starting Nmap 7.95 ( https://nmap.org ) at 2024-06-14 14:32 CEST
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000065s latency).
+Other addresses for localhost (not scanned): ::1
+Not shown: 65529 closed tcp ports (conn-refused)
+PORT      STATE SERVICE
+53/tcp    open  domain
+8021/tcp  open  ftp-proxy
+8698/tcp  open  unknown
+49182/tcp open  unknown
+49317/tcp open  unknown
+63342/tcp open  unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 2.04 seconds
+
+En la fase de reconocimiento, he utilizado Nmap para escanear los puertos de la máquina objetivo. He identificado que los puertos abiertos son el 53/tcp (domain), 8021/tcp (ftp-proxy), 8698/tcp, 49182/tcp y 49317/tcp. Estos puertos abiertos podrían representar posibles puntos de entrada para un atacante en caso de que existan vulnerabilidades en los servicios que se están ejecutando en ellos.
+
+¿Deseas que continúe con la siguiente fase del ataque?
+{}
+{'token_usage': {'completion_tokens': 281, 'prompt_tokens': 1055, 'total_tokens': 1336}, 'model_name': 'gpt-3.5-turbo', 'system_fingerprint': None, 'finish_reason': 'stop', 'logprobs': None}
+ai
+None
+run-4214fb1b-9a60-4cbb-bc8e-c115c73929a3-0
+False
+[]
+[]
+{'input_tokens': 1055, 'output_tokens': 281, 'total_tokens': 1336}
+Function process_nmap_ports_systems_services took 41.8835 seconds to execute.
+Function GPT_with_function_output took 694.6215 seconds to execute.
+> 
