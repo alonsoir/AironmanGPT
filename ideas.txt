@@ -72,3 +72,37 @@ Hypertext Transfer Protocol
 
 
 Proporcionando extractos similares a este, puedo ayudarte a interpretar el tráfico, identificar patrones importantes, y señalar posibles problemas o áreas de interés.
+
+añadir
+
+subfinder -d localhost
+
+               __    _____           __
+   _______  __/ /_  / __(_)___  ____/ /__  _____
+  / ___/ / / / __ \/ /_/ / __ \/ __  / _ \/ ___/
+ (__  ) /_/ / /_/ / __/ / / / / /_/ /  __/ /
+/____/\__,_/_.___/_/ /_/_/ /_/\__,_/\___/_/
+
+		projectdiscovery.io
+
+[INF] Current subfinder version v2.6.6 (latest)
+[INF] Loading provider config from /Users/aironman/Library/Application Support/subfinder/provider-config.yaml
+[INF] Enumerating subdomains for localhost
+owa.regency.localhost
+server2.hunter.localhost
+server02.counterintel.localhost
+mail.localhost
+autodiscover.localhost
+mail03.regency.localhost
+mail.regency.localhost
+www.localhost
+naeu2.naeuinc.localhost
+mse-ca-mail.corp.mse.localhost
+fndlync01.5ninesdata.localhost
+localhost
+sbs.allsaintsschool.localhost
+tools.sonoma.edu.localhost
+autodiscover.regency.localhost
+mail02.regency.localhost
+exchvm.nwcnet.localhost
+[INF] Found 17 subdomains for localhost in 46 seconds 656 milliseconds
