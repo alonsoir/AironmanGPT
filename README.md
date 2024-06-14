@@ -4,6 +4,16 @@
 
 AironmanGPT also known as Jarvis is an artificial intelligence assistant based on the initial work from @luijait 
 designed to perform pentesting tasks. 
+
+The initial philosophy is to launch applications for each of the different phases, running wireshark/tshark at the 
+same time to combine the two outputs and add them as input to the LLM, so that each output will give you its opinion. 
+For now, in the initial phases I am using nmap with different parameters, along with wireshark. 
+The system prompt for now only expects you to tell it the objective to investigate, which can be an IP or a range of IPs. 
+The app expects you to have both nmap and wireshark installed on your system. 
+
+At some point I will create a make file to have all the dependencies ready. 
+At some point I will create a web interface to see the results, as well as to be able to properly export the results.
+
 This guide will help you set up and run the project on your local environment.
 
 ## Prerequisites

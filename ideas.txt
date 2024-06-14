@@ -1,0 +1,74 @@
+Comandos Útiles de tshark
+Extraer un Resumen Completo:
+
+bash
+Copiar código
+tshark -r captura_trafico.pcap > captura_trafico.txt
+Extraer Información en Formato JSON:
+
+bash
+Copiar código
+tshark -r captura_trafico.pcap -T json > captura_trafico.json
+Filtrar Solo Ciertos Protocolos (Ejemplo: HTTP):
+
+bash
+Copiar código
+tshark -r captura_trafico.pcap -Y http > captura_http.txt
+Mostrar Solo Paquetes con Errores:
+
+bash
+Copiar código
+tshark -r captura_trafico.pcap -Y "tcp.analysis.flags && tcp.flags.reset == 1" > captura_errores.txt
+Mostrar Estadísticas de Conversaciones TCP:
+
+bash
+Copiar código
+tshark -r captura_trafico.pcap -q -z conv,tcp > captura_conversaciones_tcp.txt
+Ejemplos de Información Útil para el Análisis
+Conexiones Frecuentes:
+
+Direcciones IP de origen y destino.
+Puertos de origen y destino.
+Protocolo utilizado.
+Errores o Anomalías:
+
+Paquetes con errores (como paquetes TCP con el flag de reset).
+Retransmisiones.
+Conexiones fallidas.
+Tiempos de Respuesta:
+
+Tiempo entre solicitudes y respuestas.
+Latencias elevadas.
+Patrones de Tráfico:
+
+Picos de tráfico.
+Conexiones recurrentes en intervalos específicos.
+Análisis de Ejemplo
+Supongamos que has extraído el resumen de tráfico en un archivo captura_trafico.txt. Aquí tienes cómo podrías proporcionar la información clave para el análisis:
+
+Frame 1: 74 bytes on wire (592 bits), 74 bytes captured (592 bits) on interface en0
+Ethernet II, Src: Apple_00:00:00 (00:00:00:00:00:00), Dst: Cisco_00:00:00 (00:00:00:00:00:01)
+Internet Protocol Version 4, Src: 192.168.1.100, Dst: 192.168.1.1
+Transmission Control Protocol, Src Port: 54321, Dst Port: 80, Seq: 0, Len: 0
+
+Frame 2: 74 bytes on wire (592 bits), 74 bytes captured (592 bits) on interface en0
+Ethernet II, Src: Cisco_00:00:00 (00:00:00:00:00:01), Dst: Apple_00:00:00 (00:00:00:00:00:00)
+Internet Protocol Version 4, Src: 192.168.1.1, Dst: 192.168.1.100
+Transmission Control Protocol, Src Port: 80, Dst Port: 54321, Seq: 0, Ack: 1, Len: 0
+
+Frame 3: 66 bytes on wire (528 bits), 66 bytes captured (528 bits) on interface en0
+Ethernet II, Src: Apple_00:00:00 (00:00:00:00:00:00), Dst: Cisco_00:00:00 (00:00:00:00:00:01)
+Internet Protocol Version 4, Src: 192.168.1.100, Dst: 192.168.1.1
+Transmission Control Protocol, Src Port: 54321, Dst Port: 80, Seq: 1, Ack: 1, Len: 0
+
+Frame 4: 150 bytes on wire (1200 bits), 150 bytes captured (1200 bits) on interface en0
+Ethernet II, Src: Apple_00:00:00 (00:00:00:00:00:00), Dst: Cisco_00:00:00 (00:00:00:00:00:01)
+Internet Protocol Version 4, Src: 192.168.1.100, Dst: 192.168.1.1
+Transmission Control Protocol, Src Port: 54321, Dst Port: 80, Seq: 1, Ack: 1, Len: 84
+Hypertext Transfer Protocol
+    GET /index.html HTTP/1.1\r\n
+    Host: 192.168.1.1\r\n
+    \r\n
+
+
+Proporcionando extractos similares a este, puedo ayudarte a interpretar el tráfico, identificar patrones importantes, y señalar posibles problemas o áreas de interés.

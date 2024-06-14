@@ -6,3 +6,17 @@ venv/
 __pycache__/
 .nmap
 .pcap
+
+.txt!/tools/file_nmap_ports_systems_services.nmap
+
+!/tools/file_nmap_reconnaissance.nmap
+
+!/tools/file_wireshark_dispatch_nmap_ports_services_vulnerabilities.pcap
+
+!/tools/file_wireshark_dispatch_nmap_ports_systems_services.pcap
+
+!/tools/file_wireshark_dispatch_nmap_reconnaissance.pcap
+
+!/actual-output.txt
+
+!/ideas.txt
