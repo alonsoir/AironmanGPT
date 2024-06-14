@@ -1,5 +1,6 @@
 import time
 
+
 def timer(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -8,4 +9,5 @@ def timer(func):
         elapsed_time = end_time - start_time
         print(f"Function {func.__name__} took {elapsed_time:.4f} seconds to execute.")
         return result
+
     return wrapper

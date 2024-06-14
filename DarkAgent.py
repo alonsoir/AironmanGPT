@@ -85,7 +85,9 @@ RouterPrompt = "Eres un asistente de ciberseguridad que se encarga de clasificar
 class DarkGPT:
     # Método inicializador de la clase.
     def __init__(self):
-        self.model_name = "gpt-3.5-turbo"  # Identificador del modelo de OpenAI GPT a utilizar.
+        self.model_name = (
+            "gpt-3.5-turbo"  # Identificador del modelo de OpenAI GPT a utilizar.
+        )
         self.temperature = 0.1  # Controla la aleatoriedad de las respuestas. Valores más bajos hacen que las respuestas sean más deterministas.
         self.model = ChatOpenAI(
             model=self.model_name,
@@ -101,17 +103,21 @@ class DarkGPT:
         self.pcap_output_file = "captura_trafico.pcap"
 
         # Parámetros de tiempo
-        self.initial_wait = 5  # Tiempo de espera inicial antes de iniciar la siguiente acción
+        self.initial_wait = (
+            5  # Tiempo de espera inicial antes de iniciar la siguiente acción
+        )
         self.capture_duration = 30  # Duración de la captura de tráfico en segundos
 
-        self.scanner = NetworkScanner(self.interface,
-                                      self.target_network,
-                                      self.nmap_output_file,
-                                      self.pcap_output_file,
-                                      self.initial_wait,
-                                    self.capture_duration)
-        #self.tools = [NmapTool()]
-        #self.model.bind_tools(tools=self.tools)
+        self.scanner = NetworkScanner(
+            self.interface,
+            self.target_network,
+            self.nmap_output_file,
+            self.pcap_output_file,
+            self.initial_wait,
+            self.capture_duration,
+        )
+        # self.tools = [NmapTool()]
+        # self.model.bind_tools(tools=self.tools)
 
     # Método para ejecutar una llamada a función y procesar su salida.
     @timer
@@ -128,8 +134,11 @@ class DarkGPT:
         target_ip_range = functions_prompts[1].get("content")
         query = f"Utiliza NmapTool para escanear el dominio {functions_prompts[1].get('content')}"
         print(query)
-        dispatch_nmap_recoinassance = ("RECOINASSANCE\n" + self.
-                                       scanner.capture_then_dispatch_nmap_reconnaissance(target_ip_range) + "\n")
+        dispatch_nmap_recoinassance = (
+            "RECOINASSANCE\n"
+            + self.scanner.capture_then_dispatch_nmap_reconnaissance(target_ip_range)
+            + "\n"
+        )
         processed_output = dispatch_nmap_recoinassance
 
         return str(processed_output)
@@ -149,10 +158,13 @@ class DarkGPT:
         query = f"Utiliza NmapTool para escanear el dominio {target_ip_range}"
         print(query)
 
-        dispatch_nmap_ports_systems_services_output = ("PORTS_SYSTEMS_SERVICES\n" +
-                                                       self.
-                                                       scanner.capture_then_dispatch_nmap_ports_systems_services(target_ip_range) +
-                                                       "\n")
+        dispatch_nmap_ports_systems_services_output = (
+            "PORTS_SYSTEMS_SERVICES\n"
+            + self.scanner.capture_then_dispatch_nmap_ports_systems_services(
+                target_ip_range
+            )
+            + "\n"
+        )
 
         processed_output = dispatch_nmap_ports_systems_services_output
 
@@ -173,9 +185,13 @@ class DarkGPT:
         query = f"Utiliza NmapTool para escanear el dominio {target_ip_range}"
         print(query)
 
-        dispatch_nmap_ports_services_vulnerabilities_output = ("PORTS_SERVICES_VULNERABILITIES\n" +
-                                                               self.scanner.capture_then_dispatch_nmap_ports_services_vulnerabilities(
-            target_ip_range) + "\n")
+        dispatch_nmap_ports_services_vulnerabilities_output = (
+            "PORTS_SERVICES_VULNERABILITIES\n"
+            + self.scanner.capture_then_dispatch_nmap_ports_services_vulnerabilities(
+                target_ip_range
+            )
+            + "\n"
+        )
         processed_output = dispatch_nmap_ports_services_vulnerabilities_output
 
         return str(processed_output)
@@ -183,7 +199,7 @@ class DarkGPT:
     # Método para formatear el historial de mensajes incluyendo la salida de una llamada a función.
     @timer
     def process_history_with_function_output(
-            self, messages: list, function_output: dict
+        self, messages: list, function_output: dict
     ):
         history_json = (
             []
@@ -219,9 +235,13 @@ class DarkGPT:
         # Crea una instancia de la clase NmapTool
         function_output = self.execute_function_call_recoinassance(target_ip_range)
 
-        historial_json = self.process_history_with_function_output(historial, function_output)
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
+        )
 
-        message = self.model.invoke([HumanMessage(content=historial_json[0]['content'])])
+        message = self.model.invoke(
+            [HumanMessage(content=historial_json[0]["content"])]
+        )
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
@@ -235,11 +255,17 @@ class DarkGPT:
         target_ip_range = historial[-1].get("USER")
 
         # Crea una instancia de la clase NmapTool
-        function_output = self.execute_function_call_nmap_ports_systems_services(target_ip_range)
+        function_output = self.execute_function_call_nmap_ports_systems_services(
+            target_ip_range
+        )
 
-        historial_json = self.process_history_with_function_output(historial, function_output)
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
+        )
 
-        message = self.model.invoke([HumanMessage(content=historial_json[0]['content'])])
+        message = self.model.invoke(
+            [HumanMessage(content=historial_json[0]["content"])]
+        )
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
@@ -253,11 +279,19 @@ class DarkGPT:
         target_ip_range = historial[-1].get("USER")
 
         # Crea una instancia de la clase NmapTool
-        function_output = self.execute_function_call_nmap_ports_services_vulnerabilities(target_ip_range)
+        function_output = (
+            self.execute_function_call_nmap_ports_services_vulnerabilities(
+                target_ip_range
+            )
+        )
 
-        historial_json = self.process_history_with_function_output(historial, function_output)
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
+        )
 
-        message = self.model.invoke([HumanMessage(content=historial_json[0]['content'])])
+        message = self.model.invoke(
+            [HumanMessage(content=historial_json[0]["content"])]
+        )
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
@@ -268,10 +302,10 @@ class DarkGPT:
 
     @timer
     def process_deHashed_Call(self, historial):
-        function_output = self.execute_function_call(
-            historial[-1].get("USUARIO", "")
+        function_output = self.execute_function_call(historial[-1].get("USUARIO", ""))
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
         )
-        historial_json = self.process_history_with_function_output(historial, function_output)
         # Genera una respuesta del modelo.
         respuesta = self.openai_client.chat.completions.create(
             model=self.model_name,

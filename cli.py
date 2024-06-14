@@ -29,6 +29,8 @@ class ConversationalShell:
 
         try:
             while True:
+                print("Type 'exit' to finish, 'clear' to clear the screen.\n")
+                print("target? ")
                 user_input = input("> ")  # Solicita entrada del usuario.
                 if user_input.lower() == "exit":
                     # Termina la sesión si el usuario escribe 'exit'.
@@ -70,5 +72,6 @@ class ConversationalShell:
 
         # Añade la entrada del usuario al historial JSON.
         historial_json.append({"USER": user_input})
+        print("Done!")
 
         # Cuanto historial puedo mantener???

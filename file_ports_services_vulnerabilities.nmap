@@ -1,9 +1,11 @@
-# Nmap 7.95 scan initiated Fri Jun 14 14:22:55 2024 as: nmap -sT -sV --script vuln -T4 -p- -oN file_ports_services_vulnerabilities.nmap localhost
+# Nmap 7.95 scan initiated Fri Jun 14 20:36:21 2024 as: nmap -sT -sV --script vuln -T4 -p- -oN file_ports_services_vulnerabilities.nmap localhost
+Strange read error from 127.0.0.1 (22 - 'Invalid argument')
+Strange read error from 127.0.0.1 (22 - 'Invalid argument')
 Strange read error from 127.0.0.1 (22 - 'Invalid argument')
 Nmap scan report for localhost (127.0.0.1)
-Host is up (0.000082s latency).
+Host is up (0.000062s latency).
 Other addresses for localhost (not scanned): ::1
-Not shown: 65528 closed tcp ports (conn-refused)
+Not shown: 65527 closed tcp ports (conn-refused)
 PORT      STATE    SERVICE        VERSION
 53/tcp    open     domain         (generic dns response: SERVFAIL)
 | fingerprint-strings: 
@@ -11,7 +13,23 @@ PORT      STATE    SERVICE        VERSION
 |     version
 |_    bind
 8021/tcp  open     tcpwrapped
-8698/tcp  open     http           Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+49181/tcp open     unknown
+| fingerprint-strings: 
+|   NULL: 
+|_    {"device":{"device_id":"6ac5149c-3db7-4ae7-b628-b50ab55e6ac0","model":"MacBookPro15,3","hostname":"MacBook Pro de Alonso","device_os":"macos","device_os_version":"14.5.0","device_type":"laptop"},"products":[{"app_id":"com.bitdefender.avformac","connect_version":"10.1.0.8"},{"app_id":"com.bitdefender.vpn","connect_version":"5.0.0.80"}]}
+49219/tcp open     bandwidth-test MikroTik bandwidth-test server
+49417/tcp filtered unknown
+51225/tcp filtered unknown
+63342/tcp open     http           PyCharm 2024.1
+|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
+| vulners: 
+|   cpe:/a:jetbrains:pycharm:2024.1: 
+|     	CVE-2024-37051	9.3	https://vulners.com/cve/CVE-2024-37051
+|     	806E2047-C153-548D-954E-A8ED13059DD5	9.3	https://vulners.com/githubexploit/806E2047-C153-548D-954E-A8ED13059DD5	*EXPLOIT*
+|_    	6A3E5E9A-8C7C-524F-BB63-EDBA4EF46CA5	9.3	https://vulners.com/githubexploit/6A3E5E9A-8C7C-524F-BB63-EDBA4EF46CA5	*EXPLOIT*
+|_http-dombased-xss: Couldn't find any DOM based XSS.
+|_http-csrf: Couldn't find any CSRF vulnerabilities.
+|_http-server-header: PyCharm 2024.1
 | http-slowloris-check: 
 |   VULNERABLE:
 |   Slowloris DOS attack
@@ -26,32 +44,14 @@ PORT      STATE    SERVICE        VERSION
 |     References:
 |       http://ha.ckers.org/slowloris/
 |_      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-6750
-|_http-dombased-xss: Couldn't find any DOM based XSS.
-|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
-|_http-csrf: Couldn't find any CSRF vulnerabilities.
-49182/tcp open     bandwidth-test MikroTik bandwidth-test server
-49317/tcp open     unknown
-| fingerprint-strings: 
-|   NULL: 
-|_    {"device":{"device_id":"6ac5149c-3db7-4ae7-b628-b50ab55e6ac0","model":"MacBookPro15,3","hostname":"MacBook Pro de Alonso","device_os":"macos","device_os_version":"14.5.0","device_type":"laptop"},"products":[{"app_id":"com.bitdefender.avformac","connect_version":"10.1.0.8"},{"app_id":"com.bitdefender.vpn","connect_version":"5.0.0.80"}]}
-57250/tcp filtered unknown
-63342/tcp open     http           PyCharm 2024.1
-|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
-|_http-server-header: PyCharm 2024.1
-|_http-csrf: Couldn't find any CSRF vulnerabilities.
-| vulners: 
-|   cpe:/a:jetbrains:pycharm:2024.1: 
-|     	CVE-2024-37051	9.3	https://vulners.com/cve/CVE-2024-37051
-|     	806E2047-C153-548D-954E-A8ED13059DD5	9.3	https://vulners.com/githubexploit/806E2047-C153-548D-954E-A8ED13059DD5	*EXPLOIT*
-|_    	6A3E5E9A-8C7C-524F-BB63-EDBA4EF46CA5	9.3	https://vulners.com/githubexploit/6A3E5E9A-8C7C-524F-BB63-EDBA4EF46CA5	*EXPLOIT*
-|_http-dombased-xss: Couldn't find any DOM based XSS.
+65047/tcp filtered unknown
 2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
 ==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port53-TCP:V=7.95%I=7%D=6/14%Time=666C3636%P=x86_64-apple-darwin23.4.0%
+SF-Port53-TCP:V=7.95%I=7%D=6/14%Time=666C8DBD%P=x86_64-apple-darwin23.4.0%
 SF:r(DNSVersionBindReqTCP,20,"\0\x1e\0\x06\x81\x82\0\x01\0\0\0\0\0\0\x07ve
 SF:rsion\x04bind\0\0\x10\0\x03");
 ==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port49317-TCP:V=7.95%I=7%D=6/14%Time=666C362B%P=x86_64-apple-darwin23.4
+SF-Port49181-TCP:V=7.95%I=7%D=6/14%Time=666C8DB2%P=x86_64-apple-darwin23.4
 SF:.0%r(NULL,151,"{\"device\":{\"device_id\":\"6ac5149c-3db7-4ae7-b628-b50
 SF:ab55e6ac0\",\"model\":\"MacBookPro15,3\",\"hostname\":\"MacBook\x20Pro\
 SF:x20de\x20Alonso\",\"device_os\":\"macos\",\"device_os_version\":\"14\.5
@@ -60,4 +60,4 @@ SF:defender\.avformac\",\"connect_version\":\"10\.1\.0\.8\"},{\"app_id\":\
 SF:"com\.bitdefender\.vpn\",\"connect_version\":\"5\.0\.0\.80\"}\]}");
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-# Nmap done at Fri Jun 14 14:31:56 2024 -- 1 IP address (1 host up) scanned in 540.80 seconds
+# Nmap done at Fri Jun 14 20:45:21 2024 -- 1 IP address (1 host up) scanned in 539.53 seconds
