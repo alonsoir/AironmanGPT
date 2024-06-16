@@ -9,8 +9,10 @@ The initial philosophy is to launch applications for each of the different phase
 same time to combine the two outputs and add them as input to the LLM, so that each output will give you its opinion. 
 For now, in the initial phases I am using nmap with different parameters, along with wireshark. 
 The system prompt for now only expects you to tell it the objective to investigate, which can be an IP or a range of IPs. 
-The app expects you to have both nmap and wireshark installed on your system. 
-
+The app expects you to have both some dependencies like nmap, wireshark and more to be installed on your system. 
+The app lets you to run commands from your system and output the results to the llm. Use with caution.
+The app lets you to target a specific ip/range, which is the one that you want to scan. Basically it will run a bunch
+of commands, output to the llm each output to feed it and give you the results.
 At some point I will create a make file to have all the dependencies ready. 
 At some point I will create a web interface to see the results, as well as to be able to properly export the results.
 
@@ -20,6 +22,9 @@ This guide will help you set up and run the project on your local environment.
 
    Before starting, make sure you have Python installed on your system. This project has been tested with Python 3.10 
    and higher versions.
+   nmap 
+   wireshark
+   curl
 
 ## Environment Setup
 

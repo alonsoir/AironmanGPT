@@ -229,6 +229,25 @@ class DarkGPT:
         self.process_nmap_ports_systems_services(historial)
 
     @timer
+    def GPT_with_command_output(self, historial, callback=None):
+        output_command = historial[-1].get("USER")
+
+        historial_json = self.process_history_with_function_output(
+            historial, output_command
+        )
+
+        message = self.model.invoke(
+            [HumanMessage(content=historial_json[0]["content"])]
+        )
+
+        # Itera a través de los fragmentos de respuesta e imprime el contenido.
+        for chunk in message:
+            try:
+                print(chunk[1])
+            except:
+                pass  # Ignora los errores en el procesamiento de fragmentos.
+    # Ejecuta la llamada a la función y obtiene su salida.
+    @timer
     def process_nmap_recoinassance(self, historial):
         target_ip_range = historial[-1].get("USER")
 
