@@ -7,13 +7,20 @@ designed to perform pentesting tasks.
 
 The initial philosophy is to launch applications for each of the different phases, running wireshark/tshark at the 
 same time to combine the two outputs and add them as input to the LLM, so that each output will give you its opinion. 
+
 For now, in the initial phases I am using nmap with different parameters, along with wireshark. 
+
 The system prompt for now only expects you to tell it the objective to investigate, which can be an IP or a range of IPs. 
+
 The app expects you to have both some dependencies like nmap, wireshark and more to be installed on your system. 
+
 The app lets you to run commands from your system and output the results to the llm. Use with caution.
+
 The app lets you to target a specific ip/range, which is the one that you want to scan. Basically it will run a bunch
 of commands, output to the llm each output to feed it and give you the results.
-At some point I will create a make file to have all the dependencies ready. 
+
+At some point I will create a make file to have all the dependencies ready. DONE!
+
 At some point I will create a web interface to see the results, as well as to be able to properly export the results.
 
 This guide will help you set up and run the project on your local environment.
@@ -36,10 +43,10 @@ This guide will help you set up and run the project on your local environment.
    command in your terminal:
 
 ```shell
-git clone https://github.com/alonsoir/AironmanGPT.git
+  git clone https://github.com/alonsoir/AironmanGPT.git
 ```
 ```shell
-cd AironmanGPT
+  cd AironmanGPT
 ```
 
 2. **Configure Environment Variables**
@@ -83,9 +90,19 @@ cd AironmanGPT
   docker run -it --env-file .env aironman/aironmangpt:0.0.1
 ```
 
-8(Optional) run container:
+8. (Optional) run container:
 ```shell
   docker-compose run aironmangpt
+```
+
+9. (Optional, from scratch) use makefile:
+```shell
+  make all
+```
+
+10. (Optional, from scratch) build and run the container:
+```shell
+  make container-build container-run
 ```
 
 DeHashed API Key (Optional, not tested yet)
