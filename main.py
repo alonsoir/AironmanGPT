@@ -32,7 +32,9 @@ def test_openai_api():
     try:
         client = OpenAI(api_key=api_key)
 
-        response = client.completions.create(model=model_name_test, prompt="This is a test.")
+        response = client.completions.create(
+            model=model_name_test, prompt="This is a test."
+        )
         print("Connection to OpenAI API successful!")
         print("Response:", response)
     except Exception as e:

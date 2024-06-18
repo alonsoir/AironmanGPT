@@ -4,6 +4,15 @@ FROM python:3.12.4-bullseye AS builder
 # Establecer el directorio de trabajo
 WORKDIR /app
 
+# Copiar el archivo .env al contenedor
+COPY .env .env
+
+# Usar el archivo .env para configurar las variables de entorno
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+
+# Agregar el archivo .env a .bashrc para asegurarse de que las variables de entorno estén disponibles en el entorno interactivo
+RUN echo "source /app/.env" >> /etc/bash.bashrc
+
 # Actualizar lista de paquetes e instalar dependencias
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

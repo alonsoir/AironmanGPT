@@ -82,9 +82,13 @@ class DarkGPT:
     def __init__(self):
         api_key = os.getenv("OPENAI_API_KEY")
         model_name = os.getenv("GPT_MODEL_NAME")
-        print(f"Using OpenAI API key: {api_key} and {model_name} model in class DarkGPT.")
+        print(
+            f"Using OpenAI API key: {api_key} and {model_name} model in class DarkGPT."
+        )
 
-        self.model_name = model_name  # Identificador del modelo de OpenAI GPT a utilizar.
+        self.model_name = (
+            model_name  # Identificador del modelo de OpenAI GPT a utilizar.
+        )
         self.temperature = 0.1  # Controla la aleatoriedad de las respuestas. Valores más bajos hacen que las respuestas sean más deterministas.
         self.model = ChatOpenAI(
             model=self.model_name,

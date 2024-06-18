@@ -20,8 +20,10 @@ This guide will help you set up and run the project on your local environment.
 
 ## Prerequisites
 
-   Before starting, make sure you have Python installed on your system. This project has been tested with Python 3.10 
+   Before starting, make sure you have Python installed on your system. 
+   This project has been tested with Python 3.10 
    and higher versions.
+   Make sure you have docker installed on your system.
    nmap 
    wireshark
    curl
@@ -41,15 +43,25 @@ cd AironmanGPT
 ```
 
 2. **Configure Environment Variables**
-
-   You will need to set up some environment variables for the script to work correctly. Copy the `.example.env` file to 
+   
+   Copy the `.example.env` file to 
    a new file named `.env`:
 
+   You will need to set up some environment variables for the script to work correctly. 
+   I had problems running the container with this format:
+
+      OPENAI_API_KEY="API_KEY from openai.com"
+
+   so i recommend you to use the following format, without double quotes:
+
 ```env
-DEHASHED_API_KEY="your_dehashed_api_key_here"
-DEHASHED_USERNAME="your_dehashed_username"
-OPENAI_API_KEY="API_KEY from openai.com"
+   DEHASHED_API_KEY=your_dehashed_api_key_here
+   DEHASHED_USERNAME=your_dehashed_username
+   OPENAI_API_KEY=API_KEY from openai.com
+   GPT_MODEL_NAME=gpt-4-turbo-preview
+   GPT_MODEL_NAME_TEST=babbage-002
 ```
+
 4. **Install Dependencies**
 
    This project requires certain Python packages to run. Install them by running the following command:
@@ -60,10 +72,23 @@ OPENAI_API_KEY="API_KEY from openai.com"
 ```
 5. Then Run the project:
 ```shell
-poetry run python main.py
+  poetry run python main.py
+```
+6. (Optional) build the image and container:
+```shell
+  docker build -t aironman/aironmangpt:0.0.1 .
+```
+7. (Optional) run container:
+```shell
+  docker run -it --env-file .env aironman/aironmangpt:0.0.1
 ```
 
-DeHashed API Key
+8(Optional) run container:
+```shell
+  docker-compose run aironmangpt
+```
+
+DeHashed API Key (Optional, not tested yet)
 1. Sign Up or Log In: Visit the DeHashed website (https://www.dehashed.com/). If you don't already have an account, 
 you'll need to sign up. If you do, just log in.
 2. Subscription: DeHashed is a paid service, so you'll need to subscribe to one of their plans to get access to the API. 
@@ -87,15 +112,17 @@ who should not have access to it.
 6. General Tips for Managing API Keys:
 Environment Variables: Store your API keys in environment variables rather than hard-coding them into your project. 
 This makes your application more secure and flexible.
-.gitignore: If you're using Git, ensure your .env file or any file containing API keys is listed in your .gitignore file 
-to prevent it from being uploaded to a public repository.
 
-Documentation: Always refer to the official documentation of the API provider for the most accurate and up-to-date 
+7. .gitignore: If you're using Git, ensure your .env file or any file containing API keys is listed in your .gitignore 
+file to prevent it from being uploaded to a public repository.
+
+8. Documentation: Always refer to the official documentation of the API provider for the most accurate and up-to-date 
 information on obtaining and using API keys.
-By following these steps and guidelines, you'll be able to obtain the necessary API keys to integrate DeHashed and 
+
+9. By following these steps and guidelines, you'll be able to obtain the necessary API keys to integrate DeHashed and 
 OpenAI services into your projects.
 
-GPT4All
+GPT4All (Optional, in progress)
 
 The idea is to be able to use autonomous agents for each of the phases of a pentesting operation. 
 To do this, an LLM will be used that interacts with each of the invocations of said agents and collects the inputs and 
