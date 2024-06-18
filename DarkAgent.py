@@ -1,17 +1,12 @@
 import json
 import os
-import subprocess
-import sys
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
-from tools.nmap_recognition import NmapTool
 from tools.tools import timer
 from tools.tshark_nmap import NetworkScanner
-
-load_dotenv()
 
 # Definición de los prompts que se utilizarán para generar las respuestas del modelo.
 AgentPrompt = """
@@ -85,9 +80,11 @@ RouterPrompt = "Eres un asistente de ciberseguridad que se encarga de clasificar
 class DarkGPT:
     # Método inicializador de la clase.
     def __init__(self):
-        self.model_name = (
-            "gpt-3.5-turbo"  # Identificador del modelo de OpenAI GPT a utilizar.
-        )
+        api_key = os.getenv("OPENAI_API_KEY")
+        model_name = os.getenv("GPT_MODEL_NAME")
+        print(f"Using OpenAI API key: {api_key} and {model_name} model in class DarkGPT.")
+
+        self.model_name = model_name  # Identificador del modelo de OpenAI GPT a utilizar.
         self.temperature = 0.1  # Controla la aleatoriedad de las respuestas. Valores más bajos hacen que las respuestas sean más deterministas.
         self.model = ChatOpenAI(
             model=self.model_name,
@@ -95,7 +92,7 @@ class DarkGPT:
             max_tokens=None,
             timeout=None,
             max_retries=2,
-            api_key=os.getenv("OPENAI_API_KEY"),
+            api_key=api_key,
         )
         self.interface = "en0"  # Reemplazar con tu interfaz de red adecuada (por ejemplo, en0, en1, etc.)
         self.target_network = "localhost"
@@ -246,6 +243,7 @@ class DarkGPT:
                 print(chunk[1])
             except:
                 pass  # Ignora los errores en el procesamiento de fragmentos.
+
     # Ejecuta la llamada a la función y obtiene su salida.
     @timer
     def process_nmap_recoinassance(self, historial):

@@ -1,0 +1,8 @@
+version: '3'
+services:
+  langchain-chat-app:
+    image: aironman/aironmanGPT:latest
+    build: ./app
+    command: poetry run  python main.py
+    volumes:
+      - ./app/:/app/

@@ -50,8 +50,12 @@ class ConversationalShell:
                     os.system("cls" if os.name == "nt" else "clear")
                     continue
 
-                coincidencia_patron_command = re.search(patron_command, user_input.lower())
-                coincidencia_patron_target = re.search(patron_target, user_input.lower())
+                coincidencia_patron_command = re.search(
+                    patron_command, user_input.lower()
+                )
+                coincidencia_patron_target = re.search(
+                    patron_target, user_input.lower()
+                )
 
                 if coincidencia_patron_command:
                     # Extraer el comando
@@ -67,8 +71,14 @@ class ConversationalShell:
                         comando = "curl -s ifconfig.me | sed 's/%$//'"
                         try:
                             # Ejecutar el comando usando subprocess
-                            resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
-                            print(resultado.stdout if resultado.returncode == 0 else resultado.stderr)
+                            resultado = subprocess.run(
+                                comando, shell=True, capture_output=True, text=True
+                            )
+                            print(
+                                resultado.stdout
+                                if resultado.returncode == 0
+                                else resultado.stderr
+                            )
                             self.ProcessInput(resultado.stdout)
                         except Exception as e:
                             print(f"Error al ejecutar el comando: {str(e)}")
@@ -87,9 +97,12 @@ class ConversationalShell:
         """
         try:
             # Ejecutar el comando usando subprocess
-            resultado = subprocess.run(command, shell=True, capture_output=True, text=True)
+            resultado = subprocess.run(
+                command, shell=True, capture_output=True, text=True
+            )
             print(resultado.stdout if resultado.returncode == 0 else resultado.stderr)
             if resultado.returncode == 0:
+
                 def handle_chunk(chunk_content):
                     """
                     Función interna para manejar los fragmentos de contenido devueltos por DarkGPT.
@@ -106,13 +119,16 @@ class ConversationalShell:
                 ]  # Prepara el historial para ser procesado por DarkGPT.
 
                 # Llama a DarkGPT para procesar la entrada y manejar la salida con la función handle_chunk.
-                self.darkgpt.GPT_with_command_output(historial_json, callback=handle_chunk)
+                self.darkgpt.GPT_with_command_output(
+                    historial_json, callback=handle_chunk
+                )
 
                 # Añade la entrada del usuario al historial JSON.
                 historial_json.append({"USER": command})
                 print("Done!")
         except Exception as e:
             print(f"Error al ejecutar el comando: {str(e)}")
+
     def ProcessInput(self, user_input):
         """
         Procesa la entrada del usuario, enviándola a DarkGPT y manejando la salida.
