@@ -25,12 +25,15 @@ class ConversationalShell:
         Inicia el bucle principal de la shell conversacional, procesando comandos del usuario.
         """
         # Mensaje de bienvenida al usuario.
-        initial_message = "Welcome to Jarvis, an experiment to demonstrate the use of different specific tools as autonomous \n Langchain agents for pentesting.\n Type 'exit' to finish, 'clear' to clear the screen.\nIntroduce the target you want to scan, and Jarvis will try to find the right tool for you."
+        initial_message = ("Welcome to Jarvis, an experiment to demonstrate the use of different specific tools as "
+                           "autonomous \n Langchain agents for pentesting.\n Type 'exit' to finish, 'clear' to clear the "
+                           "screen.\nIntroduce the target you want to scan, and Jarvis will try to find the right tool "
+                           "for you.")
         logger.start(self.name_session)
         logger.info(initial_message)
         patron_command = r"command=(.*)"
         patron_target = r"target=(.*)"
-
+        patron_command_not_send = r".*"
         try:
             while True:
 
@@ -48,7 +51,9 @@ class ConversationalShell:
                     # Limpia la pantalla si el usuario escribe 'clear'.
                     os.system("cls" if os.name == "nt" else "clear")
                     continue
-
+                coincidencia_patron_command_not_send = re.search(
+                    patron_command_not_send, user_input.lower()
+                )
                 coincidencia_patron_command = re.search(
                     patron_command, user_input.lower()
                 )
@@ -56,11 +61,17 @@ class ConversationalShell:
                     patron_target, user_input.lower()
                 )
 
+                if coincidencia_patron_command_not_send:
+                    # Extraer el comando
+                    comando = coincidencia_patron_command_not_send.string.strip()
+                    logger.info(f"Ejecutando comando: {comando}")
+                    self.ProcessCommand(comando, send_output=False)
+
                 if coincidencia_patron_command:
                     # Extraer el comando
                     comando = coincidencia_patron_command.group(1).strip()
                     logger.info(f"Ejecutando comando: {comando}")
-                    self.ProcessCommand(comando)
+                    self.ProcessCommand(comando,send_output=True)
 
                 if coincidencia_patron_target:
                     # Extraer el target
@@ -93,7 +104,7 @@ class ConversationalShell:
             logger.error(f"\nSession terminated by the user. {k}")
             pass
 
-    def ProcessCommand(self, command):
+    def ProcessCommand(self, command, send_output=True):
         """
         Procesa el comando del usuario y envia la salida al llm.
         """
@@ -103,7 +114,7 @@ class ConversationalShell:
                 command, shell=True, capture_output=True, text=True
             )
             logger.info(resultado.stdout if resultado.returncode == 0 else resultado.stderr)
-            if resultado.returncode == 0:
+            if resultado.returncode == 0 and send_output:
 
                 def handle_chunk(chunk_content):
                     """

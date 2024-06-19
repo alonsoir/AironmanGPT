@@ -42,8 +42,8 @@ def test_openai_api():
         logger.debug("Connection to OpenAI API successful!")
         logger.debug("Response:", response.model)
     except Exception as e:
-        logger.exception(f"Error connecting to OpenAI API: {e}")
-
+        logger.error("Error connecting to OpenAI API. Probably the API key is missing or invalid.")
+        logger.error("Check the.env file and try again. https://platform.openai.com/api-keys")
 
 # Definición de la función principal
 def main():

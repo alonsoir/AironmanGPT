@@ -1,4 +1,4 @@
-all: setup container-build container-run size
+all: setup container-build container-run container-vulns size
 
 setup: requirements install_python install validate_python_libs
 
@@ -58,3 +58,8 @@ container-build:
 	docker build -f Dockerfile -t aironman/aironmangpt:0.0.1 .
 container-run:
 	docker run -it --env-file .env aironman/aironmangpt:0.0.1
+container-vulns:
+	docker scout quickview aironman/aironmangpt:0.0.1
+	docker scout cves aironman/aironmangpt:0.0.1
+	docker scout recommendations aironman/aironmangpt:0.0.1
+	docker scout quickview aironman/aironmangpt:0.0.1 --org aironman
