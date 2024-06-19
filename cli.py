@@ -26,7 +26,6 @@ class ConversationalShell:
         """
         # Mensaje de bienvenida al usuario.
         initial_message = "Welcome to Jarvis, an experiment to demonstrate the use of different specific tools as autonomous \n Langchain agents for pentesting.\n Type 'exit' to finish, 'clear' to clear the screen.\nIntroduce the target you want to scan, and Jarvis will try to find the right tool for you."
-        print(initial_message)
         logger.start(self.name_session)
         logger.info(initial_message)
         patron_command = r"command=(.*)"
@@ -34,10 +33,7 @@ class ConversationalShell:
 
         try:
             while True:
-                print(
-                    "Type 'exit' to finish, 'clear' to clear the screen.\n"
-                    "'command=some command' target='ip-target/range target'\n"
-                )
+
                 logger.info("Type 'exit' to finish, 'clear' to clear the screen.\n"
                     "'command=some command' target='ip-target/range target'\n")
                 user_input = input("> ")  # Solicita entrada del usuario.
@@ -45,8 +41,7 @@ class ConversationalShell:
                 if user_input.lower() == "exit":
 
                     # Termina la sesión si el usuario escribe 'exit'.
-                    print(f"Session ended. check the log file for details. {self.name_session}")
-                    logger.info("Session ended.")
+                    logger.info(f"Session ended. check the log file for details. {self.name_session}")
                     break
 
                 if user_input.lower() == "clear":
@@ -64,7 +59,6 @@ class ConversationalShell:
                 if coincidencia_patron_command:
                     # Extraer el comando
                     comando = coincidencia_patron_command.group(1).strip()
-                    print(f"Ejecutando comando: {comando}")
                     logger.info(f"Ejecutando comando: {comando}")
                     self.ProcessCommand(comando)
 
@@ -72,7 +66,6 @@ class ConversationalShell:
                     # Extraer el target
                     target = coincidencia_patron_target.group(1).strip()
                     if target.lower() == "localhost" or target == "127.0.0.1":
-                        print("Target es localhost")
                         logger.info("Target es localhost")
                         comando = "curl -s ifconfig.me | sed 's/%$//'"
                         logger.info(f"Ejecutando comando: {comando}")
@@ -81,11 +74,7 @@ class ConversationalShell:
                             resultado = subprocess.run(
                                 comando, shell=True, capture_output=True, text=True
                             )
-                            print(
-                                resultado.stdout
-                                if resultado.returncode == 0
-                                else resultado.stderr
-                            )
+
                             logger.info(
                                 resultado.stdout
                                 if resultado.returncode == 0
@@ -93,17 +82,14 @@ class ConversationalShell:
                             )
                             self.ProcessInput(resultado.stdout)
                         except Exception as e:
-                            print(f"Error al ejecutar el comando: {str(e)}")
                             logger.error(f"Error al ejecutar el comando: {str(e)}")
                             self.ProcessInput(target)
                     else:
-                        print(f"Target es: {target}")
                         logger.info(f"Target es: {target}")
                         self.ProcessInput(target)
 
         except KeyboardInterrupt as k:
             # Maneja la interrupción por teclado para terminar la sesión.
-            print("\nSession terminated by the user.")
             logger.error(f"\nSession terminated by the user. {k}")
             pass
 
@@ -116,7 +102,6 @@ class ConversationalShell:
             resultado = subprocess.run(
                 command, shell=True, capture_output=True, text=True
             )
-            print(resultado.stdout if resultado.returncode == 0 else resultado.stderr)
             logger.info(resultado.stdout if resultado.returncode == 0 else resultado.stderr)
             if resultado.returncode == 0:
 
@@ -126,7 +111,6 @@ class ConversationalShell:
 
                     :param chunk_content: Contenido devuelto por DarkGPT.
                     """
-                    print(chunk_content, end="")
                     logger.info(chunk_content)
                 # Actualiza el historial con la entrada del usuario.
                 self.history.update({"USER": command})
@@ -142,9 +126,8 @@ class ConversationalShell:
 
                 # Añade la entrada del usuario al historial JSON.
                 historial_json.append({"USER": command})
-                print("Done!")
+                logger.info("Done!")
         except Exception as e:
-            print(f"Error al ejecutar el comando: {str(e)}")
             logger.error(f"Error al ejecutar el comando: {str(e)}")
 
     def ProcessInput(self, user_input):
@@ -160,7 +143,6 @@ class ConversationalShell:
 
             :param chunk_content: Contenido devuelto por DarkGPT.
             """
-            print(chunk_content, end="")
             logger.info(chunk_content)
 
         # Actualiza el historial con la entrada del usuario.
@@ -174,6 +156,6 @@ class ConversationalShell:
 
         # Añade la entrada del usuario al historial JSON.
         historial_json.append({"USER": user_input})
-        print("Done!")
+        logger.info("Done!")
 
         # Cuanto historial puedo mantener???

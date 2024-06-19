@@ -18,8 +18,7 @@ banner = r"""
 hecho por: @alonso_isidoro
 """
 # Imprimir el banner para dar la bienvenida al usuario
-print(banner)
-logger.add(banner)
+logger.info(banner)
 
 
 def test_openai_api():
@@ -29,10 +28,11 @@ def test_openai_api():
     if not api_key:
         logger.debug("API key is missing.")
         return
-
+    """
     logger.debug(
         f"Using OpenAI API key: {api_key} and {model_name_test} model as a test."
     )
+    """
     try:
         client = OpenAI(api_key=api_key)
 
@@ -40,7 +40,7 @@ def test_openai_api():
             model=model_name_test, prompt="This is a test."
         )
         logger.debug("Connection to OpenAI API successful!")
-        logger.debug("Response:", response)
+        logger.debug("Response:", response.model)
     except Exception as e:
         logger.exception(f"Error connecting to OpenAI API: {e}")
 

@@ -16,6 +16,7 @@ black = "^24.4.2"
 langchain = "^0.2.5"
 langchain-openai = "^0.1.8"
 loguru = "^0.7.2"
+langchain-core = "^0.2.9"
 
 
 [build-system]

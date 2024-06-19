@@ -84,8 +84,8 @@ Establece una conversación normal
 """
 RouterPrompt = "Eres un asistente de ciberseguridad que se encarga de clasificar metadatos en funciones para OSINT"
 
-logger.info(AgentPrompt, level="INFO")
-(logger.info(RouterPrompt, level="INFO"))
+# logger.info(AgentPrompt, level="INFO")
+# logger.info(RouterPrompt, level="INFO")
 
 # Clase principal DarkGPT que encapsula la funcionalidad del modelo GPT y la interacción con la API de OpenAI.
 
@@ -188,7 +188,7 @@ class DarkGPT:
         functions_prompts = mensajes(message)
         target_ip_range = functions_prompts[1].get("content")
         query = f"Utiliza NmapTool para escanear el dominio {functions_prompts[1].get('content')}"
-        print(query)
+        logger.info(query)
         dispatch_nmap_recoinassance = (
             "RECOINASSANCE\n"
             + self.scanner.capture_then_dispatch_nmap_reconnaissance(target_ip_range)
@@ -266,12 +266,15 @@ class DarkGPT:
         for message in messages:
             # Formatea los mensajes basándose en el rol.
             if "USER" in message:
-                history_json.append({"role": "user", "content": message["USER"]})
+                message_formatted = {"role": "user", "content": message["USER"]}
+                user_json=json.dumps(message_formatted)
+                history_json.append(message_formatted)
+                logger.info(f"USER: {user_json}\n")
             elif "ASISTENTE" in message:
-                history_json.append(
-                    {"role": "assistant", "content": message["ASISTENTE"]}
-                )
-        logger.info(history_json)
+                message_formatted={"role": "assistant", "content": message["ASISTENTE"]}
+                history_json.append(message_formatted)
+                logger.info(f"ASISTENTE: {message_formatted}\n")
+
         return history_json
 
     # Método para generar respuestas utilizando el modelo GPT con la salida de la función incluida en el historial.
@@ -298,7 +301,6 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                print(chunk[1])
                 logger.info(chunk[1])
             except Exception as e:
                 logger.error(e)
@@ -323,7 +325,6 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                print(chunk[1])
                 logger.info(chunk[1])
             except:
                 pass  # Ignora los errores en el procesamiento de fragmentos.
@@ -348,7 +349,6 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                print(chunk[1])
                 logger.info(chunk[1])
             except Exception as e:
                 logger.error(e)
@@ -376,7 +376,6 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                print(chunk[1])
                 logger.info(chunk[1])
             except Exception as e:
                 logger.error(e)
@@ -398,7 +397,6 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in respuesta:
             try:
-                print(chunk.choices[0].delta.content or "\n", end="")
                 logger.info(chunk.choices[0].delta.content or "\n", end="")
             except Exception as e:
                 logger.error(e)

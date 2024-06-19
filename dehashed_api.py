@@ -2,6 +2,7 @@ import requests
 import json
 import sys
 from dotenv import load_dotenv
+from loguru import logger
 
 load_dotenv()
 
@@ -49,7 +50,7 @@ def consultar_dominio_dehashed(consulta):
 
                 resultados[tipo] = convertir_json(json_crudo_dehashed)
             except Exception as e:
-                print(f"Error al consultar {tipo}: {e}")
+                logger.error(f"Error al consultar {tipo}: {e}")
                 pass
     # Formatea los resultados para su presentación
     resultado_ordenado = ""
