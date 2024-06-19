@@ -1,0 +1,10 @@
+2024-06-19 13:01:16.667 | DEBUG    | __main__:test_openai_api:33 - Using OpenAI API key: sk-my-service-account-eb1pBqJNYh7AqttFTZvfT3BlbkFJX65XrizVHRA5GXwoYVzW and babbage-002 model as a test.
+2024-06-19 13:01:17.123 | DEBUG    | __main__:test_openai_api:42 - Connection to OpenAI API successful!
+2024-06-19 13:01:17.124 | DEBUG    | __main__:test_openai_api:43 - Response:
+2024-06-19 13:02:08.329 | DEBUG    | __main__:test_openai_api:33 - Using OpenAI API key: sk-my-service-account-eb1pBqJNYh7AqttFTZvfT3BlbkFJX65XrizVHRA5GXwoYVzW and babbage-002 model as a test.
+2024-06-19 13:02:08.796 | DEBUG    | __main__:test_openai_api:42 - Connection to OpenAI API successful!
+2024-06-19 13:02:08.797 | DEBUG    | __main__:test_openai_api:43 - Response:
+2024-06-19 13:02:08.854 | INFO     | cli:Start:31 - Welcome to Jarvis, an experiment to demonstrate the use of different specific tools as autonomous 
+ Langchain agents for pentesting.
+ Type 'exit' to finish, 'clear' to clear the screen.
+Introduce the target you want to scan, and Jarvis will try to find the right tool for you.

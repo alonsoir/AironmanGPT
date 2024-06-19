@@ -5,6 +5,7 @@ from DarkAgent import DarkGPT
 from cli import ConversationalShell
 from dotenv import load_dotenv
 from openai import OpenAI
+from loguru import logger
 
 # Banner de inicio para la aplicación, mostrando un diseño ASCII con el creador
 banner = r"""
@@ -18,6 +19,7 @@ hecho por: @alonso_isidoro
 """
 # Imprimir el banner para dar la bienvenida al usuario
 print(banner)
+logger.add(banner)
 
 
 def test_openai_api():
@@ -25,20 +27,22 @@ def test_openai_api():
     model_name_test = os.getenv("GPT_MODEL_NAME_TEST")
     model_name = os.getenv("GPT_MODEL_NAME")
     if not api_key:
-        print("API key is missing.")
+        logger.debug("API key is missing.")
         return
 
-    print(f"Using OpenAI API key: {api_key} and {model_name_test} model as a test.")
+    logger.debug(
+        f"Using OpenAI API key: {api_key} and {model_name_test} model as a test."
+    )
     try:
         client = OpenAI(api_key=api_key)
 
         response = client.completions.create(
             model=model_name_test, prompt="This is a test."
         )
-        print("Connection to OpenAI API successful!")
-        print("Response:", response)
+        logger.debug("Connection to OpenAI API successful!")
+        logger.debug("Response:", response)
     except Exception as e:
-        print(f"Error connecting to OpenAI API: {e}")
+        logger.exception(f"Error connecting to OpenAI API: {e}")
 
 
 # Definición de la función principal
@@ -55,5 +59,4 @@ def main():
 # Punto de entrada principal para ejecutar la aplicación
 if __name__ == "__main__":
     load_dotenv()
-
     main()

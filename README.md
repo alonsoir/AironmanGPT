@@ -119,7 +119,7 @@ OpenAI API Key
 1. Sign Up or Log In: Go to the OpenAI website (https://openai.com/). You'll need to create an account if you don't 
 have one, or log in if you do.
 3. Getting the API Key: Once you have been granted access, you can find your API key in your OpenAI account dashboard. 
-There should be a section for API keys or developer settings.
+There should be a section for API keys or developer settings (https://platform.openai.com/api-keys).
 4. Usage and Billing: Be aware of OpenAI's usage and billing policies. 
 Depending on the volume of your requests and the specific models you use, you might incur charges. Plan accordingly and 
 monitor your usage.

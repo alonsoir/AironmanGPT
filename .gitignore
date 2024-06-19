@@ -7,6 +7,9 @@ __pycache__/
 .nmap
 .pcap
 
+.log
+.pcapng
+
 .txt!/tools/file_nmap_ports_systems_services.nmap
 
 !/tools/file_nmap_reconnaissance.nmap

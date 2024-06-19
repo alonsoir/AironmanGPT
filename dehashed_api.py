@@ -20,7 +20,8 @@ def consultar_dominio_dehashed(consulta):
     y procesa los resultados obtenidos para devolverlos en un formato legible.
 
     Args:
-        consulta (dict): Un diccionario con los parámetros de consulta (por ejemplo, correo electrónico, nombre de usuario).
+        consulta (dict): Un diccionario con los parámetros de consulta (por ejemplo, correo electrónico, nombre de
+        usuario).
 
     Returns:
         str: Una cadena formateada con los resultados de la consulta.

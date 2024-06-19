@@ -1,10 +1,10 @@
 # Etapa de construcción
-FROM python:3.12.4-bullseye AS builder
+FROM python:3.12.4-slim-bullseye AS builder
 
 # Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copiar el archivo .env al contenedor
+# Copiar el archivo .env al contenedor. Sé que no es lo mejor, pero me daba muchos problemas si no está al arrancar.
 COPY .env .env
 
 # Usar el archivo .env para configurar las variables de entorno
@@ -42,7 +42,7 @@ USER appuser
 # Establecer el directorio de trabajo y el entorno del usuario
 WORKDIR /home/appuser/app
 
-# Instalar Poetry usando pip en el directorio del usuario
+# Instalar Poetry usando curl en el directorio del usuario
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
     /home/appuser/.local/bin/poetry config virtualenvs.in-project true && \
     /home/appuser/.local/bin/poetry config cache-dir /home/appuser/.cache/pypoetry
@@ -58,7 +58,7 @@ RUN poetry install --no-root --no-dev
 
 # Copiar los archivos de la aplicación
 COPY --chown=appuser:appuser ./tools/tshark_nmap.py ./tools/tools.py ./tools/nmap_recognition.py ./tools/
-COPY --chown=appuser:appuser cli.py DarkAgent.py darkgpt.py functions.py main.py /home/appuser/app/
+COPY --chown=appuser:appuser cli.py dehashed_api.py DarkAgent.py darkgpt.py functions.py main.py /home/appuser/app/
 
 # Establecer el punto de entrada para poetry run
 ENTRYPOINT ["poetry", "run", "python3", "main.py"]
