@@ -14,10 +14,12 @@ The system prompt for now only expects you to tell it the objective to investiga
 
 The app expects you to have both some dependencies like nmap, wireshark and more to be installed on your system. 
 
-The app lets you to run commands from your system and output the results to the llm. Use with caution.
+The app lets you to run commands from your system and output the results to the llm. Just run command=your-command.
+
+The app lets you to run command from your system and NOT output to the llm. Just run a command and see the results.
 
 The app lets you to target a specific ip/range, which is the one that you want to scan. Basically it will run a bunch
-of commands, output to the llm each output to feed it and give you the results.
+of commands, output to the llm each output to feed it and give you the results. Just run target=your-target.
 
 At some point I will create a make file to have all the dependencies ready. DONE!
 
