@@ -18,7 +18,7 @@ class ConversationalShell:
         """
         self.history = {}  # Historial de comandos del usuario.
         self.darkgpt = darkgpt  # Instancia de DarkGPT para procesamiento de GPT.
-        self.name_session = f"session-{date.today()}.log"
+        self.name_session = f"./logs/session-{date.today()}.log"
 
     def Start(self):
         """
@@ -38,7 +38,10 @@ class ConversationalShell:
             while True:
 
                 logger.info("Type 'exit' to finish, 'clear' to clear the screen.\n"
-                    "'command=some command' target='ip-target/range target'\n")
+                    "'command=some command'\n"
+                    "target='ip-target/range target'\n"
+                    "some command\n")
+                logger.info(f"A file named {self.name_session} has been created with the logs of the session.\n")
                 user_input = input("> ")  # Solicita entrada del usuario.
 
                 if user_input.lower() == "exit":
@@ -71,7 +74,7 @@ class ConversationalShell:
                     # Extraer el comando
                     comando = coincidencia_patron_command.group(1).strip()
                     logger.info(f"Ejecutando comando: {comando}")
-                    self.ProcessCommand(comando,send_output=True)
+                    self.ProcessCommand(comando, send_output=True)
 
                 if coincidencia_patron_target:
                     # Extraer el target
@@ -109,6 +112,7 @@ class ConversationalShell:
         Procesa el comando del usuario y envia la salida al llm.
         """
         try:
+            logger.info(f"Ejecutando comando: {command}")
             # Ejecutar el comando usando subprocess
             resultado = subprocess.run(
                 command, shell=True, capture_output=True, text=True
@@ -129,7 +133,8 @@ class ConversationalShell:
                 historial_json = [
                     self.history
                 ]  # Prepara el historial para ser procesado por DarkGPT.
-
+                # Igual tengo que hacer split de cada historial antes de enviar al llm...
+                logger.info(f"historial_json has {len(historial_json)} tokens...")
                 # Llama a DarkGPT para procesar la entrada y manejar la salida con la función handle_chunk.
                 self.darkgpt.GPT_with_command_output(
                     historial_json, callback=handle_chunk
@@ -161,7 +166,7 @@ class ConversationalShell:
         historial_json = [
             self.history
         ]  # Prepara el historial para ser procesado por DarkGPT.
-
+        logger.info(f"historial_json has {len(historial_json)} tokens...")
         # Llama a DarkGPT para procesar la entrada y manejar la salida con la función handle_chunk.
         self.darkgpt.GPT_with_function_output(historial_json, callback=handle_chunk)
 

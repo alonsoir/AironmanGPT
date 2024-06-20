@@ -33,6 +33,9 @@ def test_openai_api():
         f"Using OpenAI API key: {api_key} and {model_name_test} model as a test."
     )
     """
+    logger.debug(
+        f"I will to try to use the model {model_name} and {model_name_test} model as a test."
+    )
     try:
         client = OpenAI(api_key=api_key)
 

@@ -1,16 +1,16 @@
-# Etapa de construcción
 FROM python:3.12.4-slim-bullseye AS builder
 
 # Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copiar el archivo .env al contenedor. Sé que no es lo mejor, pero me daba muchos problemas si no está al arrancar.
+# Copiar el archivo .env al contenedor
 COPY .env .env
 
 # Usar el archivo .env para configurar las variables de entorno
+ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
-# Agregar el archivo .env a .bashrc para asegurarse de que las variables de entorno estén disponibles en el entorno interactivo
+# Agregar el archivo .env a .bashrc
 RUN echo "source /app/.env" >> /etc/bash.bashrc
 
 # Actualizar lista de paquetes e instalar dependencias
@@ -23,7 +23,8 @@ RUN apt-get update && \
     curl \
     nmap \
     wireshark-common \
-    wireshark && \
+    tshark ngrep tcpdump \
+    net-tools && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -32,11 +33,19 @@ RUN echo "wireshark-common wireshark-common/install-setuid boolean true" | debco
     dpkg-reconfigure -f noninteractive wireshark-common && \
     usermod -aG wireshark root
 
+# Establecer el setuid en dumpcap para permitir la captura de paquetes sin privilegios
+RUN chmod +x /usr/bin/dumpcap && \
+    setcap cap_net_raw,cap_net_admin=eip /usr/bin/dumpcap
+
 # Crear un usuario no root y establecer directorios
 RUN useradd --create-home appuser && \
-    mkdir -p /home/appuser/app /home/appuser/.cache/pypoetry && \
+    mkdir -p /home/appuser/app /home/appuser/app/logs /home/appuser/app/pcap /home/appuser/app/nmap /home/appuser/.cache/pypoetry && \
     chown -R appuser:appuser /home/appuser
 
+# Añadir el usuario al grupo wireshark
+RUN usermod -aG wireshark appuser
+
+# Cambiar al usuario no root
 USER appuser
 
 # Establecer el directorio de trabajo y el entorno del usuario

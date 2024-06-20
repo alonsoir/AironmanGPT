@@ -95,9 +95,8 @@ class DarkGPT:
     def __init__(self):
         api_key = os.getenv("OPENAI_API_KEY")
         model_name = os.getenv("GPT_MODEL_NAME")
-        logger.add(
-            f"Using OpenAI API key: {api_key} and {model_name} model in class DarkGPT.",
-            level="INFO",
+        logger.info(
+            f"Using OpenAI API key: {api_key} and {model_name} model in class DarkGPT."
         )
 
         self.model_name = (
@@ -195,6 +194,7 @@ class DarkGPT:
             + "\n"
         )
         processed_output = dispatch_nmap_recoinassance
+        logger.warning(f"processed_output has {len(processed_output)} tokens.")
         logger.info(processed_output)
         return str(processed_output)
 
@@ -222,6 +222,8 @@ class DarkGPT:
         )
 
         processed_output = dispatch_nmap_ports_systems_services_output
+        logger.warning(f"processed_output has {len(processed_output)} tokens.")
+
         logger.info(processed_output)
         return str(processed_output)
 
@@ -248,6 +250,8 @@ class DarkGPT:
             + "\n"
         )
         processed_output = dispatch_nmap_ports_services_vulnerabilities_output
+        logger.warning(f"processed_output has {len(processed_output)} tokens.")
+
         logger.info(processed_output)
         return str(processed_output)
 

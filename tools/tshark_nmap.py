@@ -35,6 +35,7 @@ class NetworkScanner:
         wireshark_cmd = (
             f"tshark -i {self.interface} -w {self.pcap_output_file} {filter_expression}"
         )
+        logger.info(f"Ejecutando comando: {wireshark_cmd}")
         self.wireshark_process = subprocess.Popen(wireshark_cmd, shell=True)
 
     def stop_wireshark_capture(self):
@@ -120,7 +121,8 @@ class NetworkScanner:
                 f"Ejecutando análisis de tipo {analysis_type}\n header is {header}\n target_ip_range is {target_ip_range}\n"
             )
             logger.info(f"command is {tshark_cmd}\n")
-            result = self.dispatch_tool("bash", tshark_cmd)
+            self.dispatch_tool("bash", tshark_cmd)
+            result = self.dispatch_tool("bash", f"cat {self.pcap_output_file}_raw.txt")
             logger.info(header + result)
             return header + result
         else:
@@ -130,12 +132,12 @@ class NetworkScanner:
     def capture_then_dispatch_nmap_reconnaissance(self, target_ip_range):
         # Iniciar Wireshark, luego ejecutar Nmap
         logger.info("Iniciando capture_then_dispatch_nmap_reconnaissance...")
-        self.pcap_output_file = f"./tools/file_wireshark_dispatch_nmap_reconnaissance-{target_ip_range}.pcap"
+        self.pcap_output_file = f"./pcap/file_wireshark_dispatch_nmap_reconnaissance-{target_ip_range}.pcap"
         self.start_wireshark_capture()
 
         # Esperar un momento para asegurarse de que Wireshark ha comenzado la captura
         time.sleep(self.initial_wait)
-        file_to = "./tools/file_nmap_reconnaissance.nmap"
+        file_to = "./nmap/file_nmap_reconnaissance.nmap"
         command = f"nmap -T4 -sT -sV -sC --top-ports 1000 -oN {file_to} --open --version-trace --script-timeout 10000 {target_ip_range}"
         logger.info(f"Running {command}\n")
         header = f"capture_then_dispatch_nmap_reconnaissance. {target_ip_range}\n"
@@ -157,6 +159,8 @@ class NetworkScanner:
         logger.info(f"Waiting for {self.initial_wait} seconds...\n")
         # Esperar un tiempo suficiente para capturar el tráfico después del escaneo
         time.sleep(self.initial_wait)
+        # Es demasiado tráfico para enviar, por ahora. Tengo que enviarlo en paquetes más pequeños.
+        """
         header = f"capture_then_dispatch_nmap_reconnaissance_tcp.{target_ip_range}\n"
         tcp = self.analyze_pcap(header, target_ip_range, "tcp")
         logger.info(f"Waiting for {self.initial_wait} seconds...\n")
@@ -177,11 +181,13 @@ class NetworkScanner:
         logger.info(f"Waiting for {self.initial_wait} seconds...\n")
         # Esperar un tiempo suficiente para capturar el tráfico después del escaneo
         time.sleep(self.initial_wait)
+        """
         final_output = (
                 capture_then_dispatch_nmap_reconnaissance
                 + "\n"
                 + raw
                 + "\n"
+                """
                 + tcp
                 + "\n"
                 + http
@@ -189,6 +195,7 @@ class NetworkScanner:
                 + dns
                 + "\n"
                 + icmp
+                """
         )
         return final_output
 
@@ -196,12 +203,12 @@ class NetworkScanner:
     def capture_then_dispatch_nmap_ports_systems_services(self, target_ip_range):
         # Iniciar Wireshark, luego ejecutar Nmap
         logger.info("Iniciando capture_then_dispatch_nmap_ports_systems_services...")
-        self.pcap_output_file = f"./tools/file_wireshark_dispatch_nmap_ports_systems_services-{target_ip_range}.pcap"
+        self.pcap_output_file = f"./pcap/file_wireshark_dispatch_nmap_ports_systems_services-{target_ip_range}.pcap"
         self.start_wireshark_capture()
 
         # Esperar un momento para asegurarse de que Wireshark ha comenzado la captura
         time.sleep(self.initial_wait)
-        file_to = "./tools/file_nmap_ports_systems_services.nmap"
+        file_to = "./nmap/file_nmap_ports_systems_services.nmap"
         command = f"nmap -sT -T4 -p- {target_ip_range} -oN {file_to}"
         logger.info(f"Running {command}\n")
         logger.info("Be patient please...\n")
@@ -225,6 +232,9 @@ class NetworkScanner:
         header = (
             f"capture_then_dispatch_nmap_ports_systems_services_tcp.{target_ip_range}\n"
         )
+        raw = self.analyze_pcap(header, target_ip_range, "raw")
+
+        """
         tcp = self.analyze_pcap(header, target_ip_range, "tcp")
 
         header = f"capture_then_dispatch_nmap_ports_systems_services_http.{target_ip_range}\n"
@@ -237,10 +247,13 @@ class NetworkScanner:
 
         header = f"capture_then_dispatch_nmap_ports_systems_services_icmp.{target_ip_range}\n"
         icmp = self.analyze_pcap(header, target_ip_range, "icmp")
-
+        """
         final_output = (
                 capture_then_dispatch_nmap_ports_systems_services
                 + "\n"
+                + raw
+                + "\n"
+                """
                 + tcp
                 + "\n"
                 + http
@@ -248,6 +261,7 @@ class NetworkScanner:
                 + dns
                 + "\n"
                 + icmp
+                """
         )
 
         return final_output
@@ -258,13 +272,13 @@ class NetworkScanner:
     ):
         # Iniciar Wireshark, luego ejecutar Nmap
         logger.info("Iniciando capture_then_dispatch_nmap_ports_services_vulnerabilities...")
-        self.pcap_output_file = f"./tools/file_wireshark_dispatch_nmap_ports_services_vulnerabilities_{target_ip_range}.pcap"
+        self.pcap_output_file = f"./pcap/file_wireshark_dispatch_nmap_ports_services_vulnerabilities_{target_ip_range}.pcap"
         self.start_wireshark_capture()
 
         # Esperar un momento para asegurarse de que Wireshark ha comenzado la captura
         time.sleep(self.initial_wait)
-        file_to = "./tools/file_nmap_ports_services_vulnerabilities.nmap"
-        command = f"nmap -sT -sV --script vuln -T4 -p- {target_ip_range} -oN file_ports_services_vulnerabilities.nmap"
+        file_to = "./nmap/file_nmap_ports_services_vulnerabilities.nmap"
+        command = f"nmap -sT -sV --script vuln -T4 -p- {target_ip_range} -oN {file_to}"
         logger.info(f"Running {command}\n")
         logger.info("Be patient please...\n")
         header = f"capture_then_dispatch_nmap_ports_services_vulnerabilities.{target_ip_range}\n"
@@ -285,6 +299,8 @@ class NetworkScanner:
         header = (
             f"capture_then_dispatch_nmap_ports_systems_services_tcp.{target_ip_range}\n"
         )
+        raw = self.analyze_pcap(header, target_ip_range, "raw")
+        """
         tcp = self.analyze_pcap(header, target_ip_range, "tcp")
 
         header = f"capture_then_dispatch_nmap_ports_systems_services_http.{target_ip_range}\n"
@@ -297,10 +313,13 @@ class NetworkScanner:
 
         header = f"capture_then_dispatch_nmap_ports_systems_services_icmp.{target_ip_range}\n"
         icmp = self.analyze_pcap(header, target_ip_range, "icmp")
-
+        """
         final_output = (
                 capture_then_dispatch_nmap_ports_services_vulnerabilities
                 + "\n"
+                + raw
+                + "\n"
+        """
                 + tcp
                 + "\n"
                 + http
@@ -308,6 +327,7 @@ class NetworkScanner:
                 + dns
                 + "\n"
                 + icmp
+        """
         )
         return final_output
 

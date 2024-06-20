@@ -1,2 +1,0 @@
-# Nmap 7.95 scan initiated Wed Jun 19 17:18:32 2024 as: nmap -sT -sV --script vuln -T4 -p- -oN file_ports_services_vulnerabilities.nmap 81.41.158.146
-# Nmap done at Wed Jun 19 17:18:44 2024 -- 1 IP address (0 hosts up) scanned in 12.32 seconds

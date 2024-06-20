@@ -1,6 +1,8 @@
-all: setup container-build container-run container-vulns size
+all: setup container-build container-vulns size container-run
 
 setup: requirements install_python install validate_python_libs
+
+container: container-build container-vulns size container-run
 
 code:
 	poetry run code .
@@ -57,7 +59,7 @@ container-build:
 	@echo "Building container image"
 	docker build -f Dockerfile -t aironman/aironmangpt:0.0.1 .
 container-run:
-	docker run -it --env-file .env aironman/aironmangpt:0.0.1
+	docker run --privileged --user appuser --rm -v $(pwd):/app --env-file .env aironman/aironmangpt:0.0.1
 container-vulns:
 	docker scout quickview aironman/aironmangpt:0.0.1
 	docker scout cves aironman/aironmangpt:0.0.1
