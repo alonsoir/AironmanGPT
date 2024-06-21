@@ -58,10 +58,19 @@ CONTAINER_IMAGE=aironman/aironmangpt:latest
 container-build:
 	@echo "Building container image"
 	docker build -f Dockerfile -t aironman/aironmangpt:0.0.1 .
+	docker build -f Dockerfile-non-bash -t aironman/aironmangpt-non-bash:0.0.1 .
 container-run:
 	docker run --rm -it --user appuser --net host --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN --device /dev/net/tun -v /sys/class/net:/sys/class/net:ro -v /usr/lib/modules:/usr/lib/modules:ro -v /tmp:/app --env-file .env aironman/aironmangpt:0.0.1
+container-run-non-bash:
+	docker run --rm -it --user appuser --net host --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN --device /dev/net/tun -v /sys/class/net:/sys/class/net:ro -v /usr/lib/modules:/usr/lib/modules:ro -v /tmp:/app --env-file .env aironman/aironmangpt-non-bash:0.0.1
+
 container-vulns:
 	docker scout quickview aironman/aironmangpt:0.0.1
 	docker scout cves aironman/aironmangpt:0.0.1
 	docker scout recommendations aironman/aironmangpt:0.0.1
 	docker scout quickview aironman/aironmangpt:0.0.1 --org aironman
+
+	docker scout quickview aironman/aironmangpt-non-bash:0.0.1
+	docker scout cves aironman/aironmangpt-non-bash:0.0.1
+	docker scout recommendations aironman/aironmangpt-non-bash:0.0.1
+	docker scout quickview aironman/aironmangpt-non-bash:0.0.1 --org aironman
