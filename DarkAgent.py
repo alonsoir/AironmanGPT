@@ -96,11 +96,11 @@ class DarkGPT:
         pcap_output_file = os.getenv("PCAP_OUTPUT_FILE")
         target_network = os.getenv("TARGET_NETWORK")
         initial_wait_time = float(os.getenv('INITIAL_WAIT', '5'))
-        capture_duration = float(os.getenv('INITIAL_WAIT', '30'))
-        self.temperature = float(os.getenv('INITIAL_WAIT', '1'))
-        self.max_tokens = float(os.getenv('INITIAL_WAIT', '30000'))
-        self.timeout = float(os.getenv('INITIAL_WAIT', '2'))
-        self.max_retries = float(os.getenv('INITIAL_WAIT', '2'))
+        capture_duration = float(os.getenv('CAPTURE_DURATION', '30'))
+        self.temperature = float(os.getenv('TEMPERATURE', '1'))
+        self.max_tokens = float(os.getenv('MAX_TOKENS', '30000'))
+        self.timeout = float(os.getenv('TIMEOUT', '2'))
+        self.max_retries = float(os.getenv('MAX_RETRIES', '2'))
         logger.info(
             f"Using OpenAI API key: {self.api_key} and {self.model_name} model in class DarkGPT."
         )
