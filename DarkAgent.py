@@ -1,13 +1,16 @@
 import json
 import os
+import time
 from datetime import date
 from json import JSONDecodeError
 
+import openai
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from loguru import logger
-from openai import Client
-
+from openai import Client, APIResponseValidationError, APIStatusError, APIConnectionError, APITimeoutError, \
+    BadRequestError, AuthenticationError, PermissionDeniedError, NotFoundError
+import tiktoken
 from dehashed_api import consultar_dominio_dehashed
 from functions import Leak_Function
 from tools.tools import timer
@@ -86,6 +89,40 @@ RouterPrompt = "Eres un asistente de ciberseguridad que se encarga de clasificar
 
 # Clase principal DarkGPT que encapsula la funcionalidad del modelo GPT y la interacción con la API de OpenAI.
 
+def chunk_message(content, max_tokens):
+    tokenizer = tiktoken.get_encoding("cl100k_base")  # Asegúrate de usar el tokenizador adecuado para tu modelo
+    tokens = tokenizer.encode(content)
+    chunks = []
+
+    start = 0
+    len_tokens = len(tokens)
+    logger.info(f"len_tokens: {len_tokens}")
+
+    while start < len_tokens:
+        end = start + max_tokens
+        if end < len_tokens:
+            # Ajustar el final para no cortar palabras
+            while end > start and not tokenizer.decode([tokens[end - 1]]).isspace():
+                end -= 1
+            if end == start:
+                end = start + max_tokens  # No se encontró espacio en blanco, forzar corte
+        chunk_tokens = tokens[start:end]
+        chunk_text = tokenizer.decode(chunk_tokens)
+        if len(chunk_text) > max_tokens:
+            logger.warning(f"Chunk text length exceeds max tokens: {len(chunk_text)}")
+            # Dividir el texto en una longitud aceptable
+            split_index = chunk_text.rfind(" ", 0, max_tokens)
+            if split_index == -1:
+                split_index = max_tokens
+            chunk_text = chunk_text[:split_index]
+        logger.info(f"chunk_tokens: {len(chunk_tokens)} start: {start} end: {end}")
+        logger.info(f"chunk_text: {len(chunk_text)} start: {start} end: {end}")
+        chunks.append(chunk_text)
+        start = end
+
+    return chunks
+
+
 class DarkGPT:
     # Método inicializador de la clase.
     def __init__(self):
@@ -95,12 +132,12 @@ class DarkGPT:
         nmap_output_file = os.getenv("NMAP_OUTPUT_FILE")
         pcap_output_file = os.getenv("PCAP_OUTPUT_FILE")
         target_network = os.getenv("TARGET_NETWORK")
-        initial_wait_time = float(os.getenv('INITIAL_WAIT', '5'))
-        capture_duration = float(os.getenv('CAPTURE_DURATION', '30'))
-        self.temperature = float(os.getenv('TEMPERATURE', '1'))
-        self.max_tokens = float(os.getenv('MAX_TOKENS', '30000'))
-        self.timeout = float(os.getenv('TIMEOUT', '2'))
-        self.max_retries = float(os.getenv('MAX_RETRIES', '2'))
+        initial_wait_time = int(os.getenv('INITIAL_WAIT', '5'))
+        capture_duration = int(os.getenv('CAPTURE_DURATION', '30'))
+        self.temperature = int(os.getenv('TEMPERATURE', '1'))
+        self.max_tokens = int(os.getenv('MAX_TOKENS', '30000'))
+        self.timeout = int(os.getenv('TIMEOUT', '2'))
+        self.max_retries = int(os.getenv('MAX_RETRIES', '2'))
         logger.info(
             f"Using OpenAI API key: {self.api_key} and {self.model_name} model in class DarkGPT."
         )
@@ -208,6 +245,74 @@ class DarkGPT:
         logger.warning(f"processed_output has {len(processed_output)} tokens.")
         logger.info(processed_output)
         return str(processed_output)
+
+    def invoke_model_with_chunks(self, historial_json):
+        content = historial_json[0]["content"]
+        max_tokens_limit = self.max_tokens - 1000  # Reduce ligeramente para dar margen de seguridad
+        logger.info(f"length of content: {len(content)}")
+        logger.info(f"max tokens: {max_tokens_limit}")
+        chunks = chunk_message(content, max_tokens_limit)
+
+        responses = []
+        try:
+            logger.info(f"There are {len(chunks)} chunks. ")
+            for chunk in chunks:
+                logger.info(f"length of chunk: {len(chunk)}")
+                message = self.invoke_with_retry(chunk)
+                responses.append(message)
+        except Exception as e:
+            logger.error(f"Error invoking doing chunks: {e}")
+            pass
+        return responses
+
+    def invoke_with_retry(self, chunk, retries=3, wait_time=5):
+        for attempt in range(retries):
+            try:
+                message = self.model.invoke([HumanMessage(content=chunk)])
+                return message
+            except APIResponseValidationError as api_response_validation_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(api_response_validation_error)
+                time.sleep(wait_time)
+            except BadRequestError as bad_request_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(bad_request_error)
+                time.sleep(wait_time)
+            except AuthenticationError as authentication_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(authentication_error)
+                time.sleep(wait_time)
+            except PermissionDeniedError as permission_denied_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(permission_denied_error)
+                time.sleep(wait_time)
+            except NotFoundError as not_found_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(not_found_error)
+                time.sleep(wait_time)
+            except APIStatusError as api_status_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.info(type(api_status_error))
+                logger.warning(api_status_error)
+                time.sleep(wait_time)
+            except APITimeoutError as api_timeout_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(api_timeout_error)
+                time.sleep(wait_time)
+            except APIConnectionError as api_connection_error:
+                logger.warning(
+                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds...")
+                logger.warning(api_connection_error)
+                time.sleep(wait_time)
+
+        raise Exception("Max retries exceeded. Request failed.")
 
     @timer
     def execute_function_call_nmap_ports_systems_services(self, message):
@@ -333,9 +438,7 @@ class DarkGPT:
             historial, function_output
         )
 
-        message = self.model.invoke(
-            [HumanMessage(content=historial_json[0]["content"])]
-        )
+        message = self.invoke_model_with_chunks(historial_json)
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
@@ -357,9 +460,7 @@ class DarkGPT:
             historial, function_output
         )
 
-        message = self.model.invoke(
-            [HumanMessage(content=historial_json[0]["content"])]
-        )
+        message = self.invoke_model_with_chunks(historial_json)
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
@@ -384,9 +485,7 @@ class DarkGPT:
             historial, function_output
         )
 
-        message = self.model.invoke(
-            [HumanMessage(content=historial_json[0]["content"])]
-        )
+        message = self.invoke_model_with_chunks(historial_json)
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
