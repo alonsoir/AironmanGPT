@@ -5,17 +5,16 @@ from json import JSONDecodeError
 
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
+from loguru import logger
 from openai import Client
 
 from dehashed_api import consultar_dominio_dehashed
 from functions import Leak_Function
 from tools.tools import timer
 from tools.tshark_nmap import NetworkScanner
-from loguru import logger
 
 name_session = f"session-{date.today()}.log"
 logger.start(name_session)
-
 
 # Definición de los prompts que se utilizarán para generar las respuestas del modelo.
 AgentPrompt = """
@@ -84,44 +83,56 @@ Establece una conversación normal
 """
 RouterPrompt = "Eres un asistente de ciberseguridad que se encarga de clasificar metadatos en funciones para OSINT"
 
-# logger.info(AgentPrompt, level="INFO")
-# logger.info(RouterPrompt, level="INFO")
 
 # Clase principal DarkGPT que encapsula la funcionalidad del modelo GPT y la interacción con la API de OpenAI.
-
 
 class DarkGPT:
     # Método inicializador de la clase.
     def __init__(self):
-        api_key = os.getenv("OPENAI_API_KEY")
-        model_name = os.getenv("GPT_MODEL_NAME")
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.model_name = os.getenv("GPT_MODEL_NAME")
+        interface_tshark = os.getenv("INTERFACE_TSHARK")
+        nmap_output_file = os.getenv("NMAP_OUTPUT_FILE")
+        pcap_output_file = os.getenv("PCAP_OUTPUT_FILE")
+        target_network = os.getenv("TARGET_NETWORK")
+        initial_wait_time = float(os.getenv('INITIAL_WAIT', '5'))
+        capture_duration = float(os.getenv('INITIAL_WAIT', '30'))
+        self.temperature = float(os.getenv('INITIAL_WAIT', '1'))
+        self.max_tokens = float(os.getenv('INITIAL_WAIT', '30000'))
+        self.timeout = float(os.getenv('INITIAL_WAIT', '2'))
+        self.max_retries = float(os.getenv('INITIAL_WAIT', '2'))
         logger.info(
-            f"Using OpenAI API key: {api_key} and {model_name} model in class DarkGPT."
+            f"Using OpenAI API key: {self.api_key} and {self.model_name} model in class DarkGPT."
         )
+        logger.info(f"interface_tshark is {interface_tshark}")
+        logger.info(f"nmap_output_file is {nmap_output_file}")
+        logger.info(f"pcap_output_file is {pcap_output_file}")
+        logger.info(f"target_network is {target_network}")
+        logger.info(f"initial_wait_time is {initial_wait_time}")
+        logger.info(f"capture_duration is {capture_duration}")
+        logger.info(f"temperature is {self.temperature}")
+        logger.info(f"max_tokens is {self.max_tokens}")
+        logger.info(f"timeout is {self.timeout}")
+        logger.info(f"max_retries is {self.max_retries}")
 
-        self.model_name = (
-            model_name  # Identificador del modelo de OpenAI GPT a utilizar.)
-        )
-        self.temperature = 0.1  # Controla la aleatoriedad de las respuestas.
         # Valores más bajos hacen que las respuestas sean más deterministas.
         self.model = ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
-            max_tokens=None,
-            timeout=None,
-            max_retries=2,
-            api_key=api_key,
+            max_tokens=self.max_tokens,
+            timeout=self.timeout,
+            max_retries=self.max_retries,
+            api_key=self.api_key,
         )
-        self.interface = "en0"  # Reemplazar con tu interfaz de red adecuada (por ejemplo, en0, en1, etc.)
-        self.target_network = "localhost"
-        self.nmap_output_file = "nmap_scan_results.xml"
-        self.pcap_output_file = "captura_trafico.pcap"
+        self.interface = interface_tshark  # Reemplazar con tu interfaz de red adecuada (por ejemplo, en0, en1, etc.)
+        self.target_network = target_network
+        self.nmap_output_file = nmap_output_file
+        self.pcap_output_file = pcap_output_file
 
         # Parámetros de tiempo
-        self.initial_wait = (
-            5  # Tiempo de espera inicial antes de iniciar la siguiente acción
-        )
-        self.capture_duration = 30  # Duración de la captura de tráfico en segundos
+        self.initial_wait = initial_wait_time  # Tiempo de espera inicial antes de iniciar la siguiente acción
+
+        self.capture_duration = capture_duration  # Duración de la captura de tráfico en segundos
 
         self.scanner = NetworkScanner(
             self.interface,
@@ -153,8 +164,8 @@ class DarkGPT:
         functions_prompts = mensajes(message)
 
         response = self.openai_client.chat.completions.create(
-            model="gpt-4",
-            temperature=0,
+            model=self.model_name,
+            temperature=self.temperature,
             messages=functions_prompts,
             functions=self.functions,
         )
@@ -189,9 +200,9 @@ class DarkGPT:
         query = f"Utiliza NmapTool para escanear el dominio {functions_prompts[1].get('content')}"
         logger.info(query)
         dispatch_nmap_recoinassance = (
-            "RECOINASSANCE\n"
-            + self.scanner.capture_then_dispatch_nmap_reconnaissance(target_ip_range)
-            + "\n"
+                "RECOINASSANCE\n"
+                + self.scanner.capture_then_dispatch_nmap_reconnaissance(target_ip_range)
+                + "\n"
         )
         processed_output = dispatch_nmap_recoinassance
         logger.warning(f"processed_output has {len(processed_output)} tokens.")
@@ -214,11 +225,11 @@ class DarkGPT:
         logger.debug(query)
 
         dispatch_nmap_ports_systems_services_output = (
-            "PORTS_SYSTEMS_SERVICES\n"
-            + self.scanner.capture_then_dispatch_nmap_ports_systems_services(
-                target_ip_range
-            )
-            + "\n"
+                "PORTS_SYSTEMS_SERVICES\n"
+                + self.scanner.capture_then_dispatch_nmap_ports_systems_services(
+            target_ip_range
+        )
+                + "\n"
         )
 
         processed_output = dispatch_nmap_ports_systems_services_output
@@ -243,11 +254,11 @@ class DarkGPT:
         logger.debug(query)
 
         dispatch_nmap_ports_services_vulnerabilities_output = (
-            "PORTS_SERVICES_VULNERABILITIES\n"
-            + self.scanner.capture_then_dispatch_nmap_ports_services_vulnerabilities(
-                target_ip_range
-            )
-            + "\n"
+                "PORTS_SERVICES_VULNERABILITIES\n"
+                + self.scanner.capture_then_dispatch_nmap_ports_services_vulnerabilities(
+            target_ip_range
+        )
+                + "\n"
         )
         processed_output = dispatch_nmap_ports_services_vulnerabilities_output
         logger.warning(f"processed_output has {len(processed_output)} tokens.")
@@ -258,7 +269,7 @@ class DarkGPT:
     # Método para formatear el historial de mensajes incluyendo la salida de una llamada a función.
     @timer
     def process_history_with_function_output(
-        self, messages: list, function_output: str
+            self, messages: list, function_output: str
     ):
         history_json = (
             []
@@ -271,11 +282,11 @@ class DarkGPT:
             # Formatea los mensajes basándose en el rol.
             if "USER" in message:
                 message_formatted = {"role": "user", "content": message["USER"]}
-                user_json=json.dumps(message_formatted)
+                user_json = json.dumps(message_formatted)
                 history_json.append(message_formatted)
                 logger.info(f"USER: {user_json}\n")
             elif "ASISTENTE" in message:
-                message_formatted={"role": "assistant", "content": message["ASISTENTE"]}
+                message_formatted = {"role": "assistant", "content": message["ASISTENTE"]}
                 history_json.append(message_formatted)
                 logger.info(f"ASISTENTE: {message_formatted}\n")
 

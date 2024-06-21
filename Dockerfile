@@ -23,7 +23,9 @@ RUN apt-get update && \
     curl \
     nmap \
     wireshark-common \
-    tshark ngrep tcpdump \
+    tshark \
+    ngrep \
+    tcpdump \
     net-tools && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
