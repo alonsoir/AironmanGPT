@@ -19,6 +19,7 @@ loguru = "^0.7.2"
 langchain-core = "^0.2.9"
 sentencepiece = "^0.2.0"
 protobuf = "^5.27.1"
+premai = "^0.3.59"
 
 
 [build-system]
