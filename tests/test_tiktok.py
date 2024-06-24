@@ -15,4 +15,6 @@ decoded_text = tokenizer.decode(tokens)
 print(f"Decoded Text: {decoded_text}")
 
 # Verifica que el texto decodificado sea igual al texto original
-assert decoded_text == sample_text, "Error: La decodificación no coincide con el texto original."
+assert (
+    decoded_text == sample_text
+), "Error: La decodificación no coincide con el texto original."

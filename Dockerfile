@@ -41,7 +41,7 @@ RUN chmod +x /usr/bin/dumpcap && \
 
 # Crear un usuario no root y establecer directorios
 RUN useradd --create-home appuser && \
-    mkdir -p /home/appuser/app /home/appuser/app/logs /home/appuser/app/pcap /home/appuser/app/nmap /home/appuser/.cache/pypoetry && \
+    mkdir -p /home/appuser/app /home/appuser/app/prompts /home/appuser/app/logs /home/appuser/app/pcap /home/appuser/app/nmap /home/appuser/.cache/pypoetry && \
     chown -R appuser:appuser /home/appuser
 
 # Añadir el usuario al grupo wireshark
@@ -70,6 +70,7 @@ RUN poetry install --no-root --no-dev
 # Copiar los archivos de la aplicación
 COPY --chown=appuser:appuser ./tools/tshark_nmap.py ./tools/tools.py ./tools/nmap_recognition.py ./tools/
 COPY --chown=appuser:appuser cli.py dehashed_api.py DarkAgent.py darkgpt.py functions.py main.py /home/appuser/app/
-
+COPY --chown=appuser:appuser ./prompts/agent_prompt.txt /home/appuser/app/prompts/agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/router_prompt.txt /home/appuser/app/prompts/router_prompt.txt
 # Establecer el punto de entrada para poetry run
 ENTRYPOINT ["poetry", "run", "python3", "main.py"]

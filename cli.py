@@ -25,10 +25,12 @@ class ConversationalShell:
         Inicia el bucle principal de la shell conversacional, procesando comandos del usuario.
         """
         # Mensaje de bienvenida al usuario.
-        initial_message = ("Welcome to Jarvis, an experiment to demonstrate the use of different specific tools as "
-                           "autonomous \n Langchain agents for pentesting.\n Type 'exit' to finish, 'clear' to clear the "
-                           "screen.\nIntroduce the target you want to scan, and Jarvis will try to find the right tool "
-                           "for you.")
+        initial_message = (
+            "Welcome to Jarvis, an experiment to demonstrate the use of different specific tools as "
+            "autonomous \n Langchain agents for pentesting.\n Type 'exit' to finish, 'clear' to clear the "
+            "screen.\nIntroduce the target you want to scan, and Jarvis will try to find the right tool "
+            "for you."
+        )
         logger.start(self.name_session)
         logger.info(initial_message)
         patron_command = r"command=(.*)"
@@ -37,17 +39,23 @@ class ConversationalShell:
         try:
             while True:
 
-                logger.info("Type 'exit' to finish, 'clear' to clear the screen.\n"
+                logger.info(
+                    "Type 'exit' to finish, 'clear' to clear the screen.\n"
                     "'command=some command'\n"
                     "target='ip-target/range target'\n"
-                    "some command\n")
-                logger.info(f"A file named {self.name_session} has been created with the logs of the session.\n")
+                    "some command\n"
+                )
+                logger.info(
+                    f"A file named {self.name_session} has been created with the logs of the session.\n"
+                )
                 user_input = input("> ")  # Solicita entrada del usuario.
 
                 if user_input.lower() == "exit":
 
                     # Termina la sesión si el usuario escribe 'exit'.
-                    logger.info(f"Session ended. check the log file for details. {self.name_session}")
+                    logger.info(
+                        f"Session ended. check the log file for details. {self.name_session}"
+                    )
                     break
 
                 if user_input.lower() == "clear":
@@ -117,7 +125,9 @@ class ConversationalShell:
             resultado = subprocess.run(
                 command, shell=True, capture_output=True, text=True
             )
-            logger.info(resultado.stdout if resultado.returncode == 0 else resultado.stderr)
+            logger.info(
+                resultado.stdout if resultado.returncode == 0 else resultado.stderr
+            )
             if resultado.returncode == 0 and send_output:
 
                 def handle_chunk(chunk_content):
@@ -127,6 +137,7 @@ class ConversationalShell:
                     :param chunk_content: Contenido devuelto por DarkGPT.
                     """
                     logger.info(chunk_content)
+
                 # Actualiza el historial con la entrada del usuario.
                 self.history.update({"USER": command})
                 self.history.update({"USER": resultado.stdout})

@@ -25,10 +25,11 @@ model = AutoModelForCausalLM.from_pretrained("0dAI/0dAI-7B")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-@app.route('/generate', methods=['POST'])
+
+@app.route("/generate", methods=["POST"])
 def generate():
     data = request.get_json()
-    prompt = data.get('prompt', '')
+    prompt = data.get("prompt", "")
 
     # Tokenizar el prompt y mover los tensores a la GPU si está disponible
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
@@ -37,8 +38,11 @@ def generate():
     generate_ids = model.generate(inputs.input_ids, max_length=30)
 
     # Decodificar el texto generado
-    generated_text = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
-    return jsonify({'generated_text': generated_text})
+    generated_text = tokenizer.batch_decode(
+        generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )[0]
+    return jsonify({"generated_text": generated_text})
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run()

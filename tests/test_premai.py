@@ -9,13 +9,13 @@ client = Prem(api_key)
 
 project_id = 540
 # mythalion-13b
-model = "remm-slerp-l2-13b" # remm-slerp-l2-13b
+model = "remm-slerp-l2-13b"  # remm-slerp-l2-13b
 system_prompt = "You are a helpful assistant."
 session_id = "my-session"
 temperature = 0.7
-query="Who won the world series in 2020?"
+query = "Quien ganó el mundial de Sudafrica en 2010?"
 messages = [
-    { "role": "user", "content":query  },
+    {"role": "user", "content": query},
 ]
 
 response = client.chat.completions.create(
@@ -24,7 +24,7 @@ response = client.chat.completions.create(
     model=model,
     system_prompt=system_prompt,
     session_id=session_id,
-    temperature=temperature
+    temperature=temperature,
 )
 print(query)
 print(response.choices[0].message.content)
