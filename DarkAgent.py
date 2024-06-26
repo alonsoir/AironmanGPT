@@ -4,8 +4,8 @@ import time
 from datetime import date
 from json import JSONDecodeError
 
-import openai
-from langchain_core.messages import HumanMessage
+import tiktoken
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from loguru import logger
 from openai import (
@@ -19,7 +19,8 @@ from openai import (
     PermissionDeniedError,
     NotFoundError,
 )
-import tiktoken
+from premai import Prem
+
 from dehashed_api import consultar_dominio_dehashed
 from functions import Leak_Function
 from tools.tools import timer, str_to_bool
@@ -62,7 +63,7 @@ def chunk_message(content, max_tokens):
                 end -= 1
             if end == start:
                 end = (
-                        start + max_tokens
+                    start + max_tokens
                 )  # No se encontró espacio en blanco, forzar corte
         chunk_tokens = tokens[start:end]
         chunk_text = tokenizer.decode(chunk_tokens)
@@ -85,7 +86,7 @@ class DarkGPT:
     # Método inicializador de la clase.
     def __init__(self):
         self.api_key = os.getenv("OPENAI_API_KEY")
-        self.model_name = os.getenv("GPT_MODEL_NAME")
+        self.openai_model_name = os.getenv("GPT_MODEL_NAME")
         interface_tshark = os.getenv("INTERFACE_TSHARK")
         nmap_output_file = os.getenv("NMAP_OUTPUT_FILE")
         pcap_output_file = os.getenv("PCAP_OUTPUT_FILE")
@@ -96,9 +97,8 @@ class DarkGPT:
         self.max_tokens = int(os.getenv("MAX_TOKENS", "30000"))
         self.timeout = int(os.getenv("TIMEOUT", "2"))
         self.max_retries = int(os.getenv("MAX_RETRIES", "2"))
-        logger.info(
-            f"Using OpenAI API key: {self.api_key} and {self.model_name} model in class DarkGPT."
-        )
+        self.default_engine = os.getenv("DEFAULT_ENGINE")
+
         logger.info(f"interface_tshark is {interface_tshark}")
         logger.info(f"nmap_output_file is {nmap_output_file}")
         logger.info(f"pcap_output_file is {pcap_output_file}")
@@ -110,9 +110,8 @@ class DarkGPT:
         logger.info(f"timeout is {self.timeout}")
         logger.info(f"max_retries is {self.max_retries}")
 
-        # Valores más bajos hacen que las respuestas sean más deterministas.
-        self.model = ChatOpenAI(
-            model=self.model_name,
+        self.model_chat_openai = ChatOpenAI(
+            model=self.openai_model_name,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
             timeout=self.timeout,
@@ -145,6 +144,26 @@ class DarkGPT:
         self.openai_client = (
             Client()
         )  # Configuración del cliente OpenAI con la clave API.
+        premai_api_key = os.getenv("PREMAI_API_KEY")
+        self.client_premai = Prem(premai_api_key)
+
+        self.premai_project_id = 540
+        # mythalion-13b
+        self.model_name_premai = "remm-slerp-l2-13b"  # remm-slerp-l2-13b
+        self.premai_system_prompt = "You are a helpful assistant."
+        self.premai_session_id = "my-session"
+        self.premai_temperature = 0.7
+        logger.warning(f"ATTENTION, using by default {self.default_engine} engine.")
+        if {self.default_engine} == "premai-api":
+            logger.info(
+                f"Using PREMAI API key: {premai_api_key} and {self.model_name_premai}."
+            )
+        if {self.default_engine} == "openai-api":
+            logger.info(
+                f"Using OpenAI API key: {self.api_key} and {self.openai_model_name} model in class DarkGPT."
+            )
+        if {self.default_engine} == "zeroday-api":
+            logger.info("NOT IMPLEMENTED YET")
 
     @timer
     # Método para ejecutar una llamada a función y procesar su salida.
@@ -161,7 +180,7 @@ class DarkGPT:
         functions_prompts = mensajes(message)
 
         response = self.openai_client.chat.completions.create(
-            model=self.model_name,
+            model=self.openai_model_name,
             temperature=self.temperature,
             messages=functions_prompts,
             functions=self.functions,
@@ -200,12 +219,13 @@ class DarkGPT:
         logger.info(query)
         capture = os.getenv("USE_TSHARK")
         bool_capture = str_to_bool(capture)
+        uso_tshark = f"USO DE WIRESHARK? {bool_capture}"
         dispatch_nmap_recoinassance = (
-                "RECOINASSANCE\n"
-                + self.scanner.capture_then_dispatch_nmap_reconnaissance(
-            bool_capture, target_ip_range
-        )
-                + "\n"
+            f"RECOINASSANCE-{uso_tshark}\n"
+            + self.scanner.capture_then_dispatch_nmap_reconnaissance(
+                bool_capture, target_ip_range
+            )
+            + "\n"
         )
         processed_output = dispatch_nmap_recoinassance
         logger.warning(f"processed_output has {len(processed_output)} tokens.")
@@ -213,9 +233,16 @@ class DarkGPT:
         return str(processed_output)
 
     def invoke_model_with_chunks(self, historial_json):
-        content = historial_json[0]["content"]
+        if type(historial_json[0]) is SystemMessage:
+            content = historial_json[0].content[0]['content']
+        if type(historial_json[0]) is HumanMessage:
+            content = historial_json[0]["content"]
+        if type(historial_json[0]) is dict:
+            content = historial_json[0]["content"]
+
+        logger.info(f"content: {content}")
         max_tokens_limit = (
-                self.max_tokens - 1000
+            self.max_tokens - 1000
         )  # Reduce ligeramente para dar margen de seguridad
         logger.info(f"length of content: {len(content)}")
         logger.info(f"max tokens: {max_tokens_limit}")
@@ -234,59 +261,48 @@ class DarkGPT:
         return responses
 
     def invoke_with_retry(self, chunk, retries=3, wait_time=5):
+        messages_premai = [{"role": "user", "content": chunk}]
+        logger.info(f"Using: {self.default_engine}")
+
+        def handle_exception(e, attempt):
+            logger.warning(
+                f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
+            )
+            logger.warning(e)
+            time.sleep(wait_time)
+
         for attempt in range(retries):
             try:
-                message = self.model.invoke([HumanMessage(content=chunk)])
-                return message
-            except APIResponseValidationError as api_response_validation_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(api_response_validation_error)
-                time.sleep(wait_time)
-            except BadRequestError as bad_request_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(bad_request_error)
-                time.sleep(wait_time)
-            except AuthenticationError as authentication_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(authentication_error)
-                time.sleep(wait_time)
-            except PermissionDeniedError as permission_denied_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(permission_denied_error)
-                time.sleep(wait_time)
-            except NotFoundError as not_found_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(not_found_error)
-                time.sleep(wait_time)
-            except APIStatusError as api_status_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.info(type(api_status_error))
-                logger.warning(api_status_error)
-                time.sleep(wait_time)
-            except APITimeoutError as api_timeout_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(api_timeout_error)
-                time.sleep(wait_time)
-            except APIConnectionError as api_connection_error:
-                logger.warning(
-                    f"Request timed out. Attempt {attempt + 1} of {retries}. Retrying in {wait_time} seconds..."
-                )
-                logger.warning(api_connection_error)
-                time.sleep(wait_time)
+                if self.default_engine == "premai-api":
+                    message = self.client_premai.chat.completions.create(
+                        project_id=self.premai_project_id,
+                        messages=messages_premai,
+                        model=self.model_name_premai,
+                        system_prompt=self.premai_system_prompt,
+                        session_id=self.premai_session_id,
+                        temperature=self.premai_temperature,
+                    )
+                    return message.choices[0].message.content
+                elif self.default_engine == "openai-api":
+                    try:
+                        message = self.model_chat_openai.invoke(
+                            [HumanMessage(content=chunk)]
+                        )
+                        return message
+                    except (
+                        APIResponseValidationError,
+                        BadRequestError,
+                        AuthenticationError,
+                        PermissionDeniedError,
+                        NotFoundError,
+                        APIStatusError,
+                        APITimeoutError,
+                        APIConnectionError,
+                    ) as e:
+                        handle_exception(e, attempt)
+            except Exception as premai_exception:
+                logger.error(type(premai_exception))
+                handle_exception(premai_exception, attempt)
 
         raise Exception("Max retries exceeded. Request failed.")
 
@@ -306,13 +322,14 @@ class DarkGPT:
         logger.debug(query)
         capture = os.getenv("USE_TSHARK")
         bool_capture = str_to_bool(capture)
-        logger.info(f"capture packets with tshark {capture}")
+        logger.info(f"capture packets with tshark {bool_capture}")
+        uso_tshark = f"USO DE WIRESHARK? {bool_capture}"
         dispatch_nmap_ports_systems_services_output = (
-                "PORTS_SYSTEMS_SERVICES\n"
-                + self.scanner.capture_then_dispatch_nmap_ports_systems_services(
-            bool_capture, target_ip_range
-        )
-                + "\n"
+            f"PORTS_SYSTEMS_SERVICES {uso_tshark}\n"
+            + self.scanner.capture_then_dispatch_nmap_ports_systems_services(
+                bool_capture, target_ip_range
+            )
+            + "\n"
         )
 
         processed_output = dispatch_nmap_ports_systems_services_output
@@ -337,12 +354,13 @@ class DarkGPT:
         logger.debug(query)
         capture = os.getenv("USE_TSHARK")
         bool_capture = str_to_bool(capture)
+        uso_tshark = f"USO DE WIRESHARK? {bool_capture}"
         dispatch_nmap_ports_services_vulnerabilities_output = (
-                "PORTS_SERVICES_VULNERABILITIES\n"
-                + self.scanner.capture_then_dispatch_nmap_ports_services_vulnerabilities(
-            bool_capture, target_ip_range
-        )
-                + "\n"
+            f"PORTS_SERVICES_VULNERABILITIES {uso_tshark}\n"
+            + self.scanner.capture_then_dispatch_nmap_ports_services_vulnerabilities(
+                bool_capture, target_ip_range
+            )
+            + "\n"
         )
         processed_output = dispatch_nmap_ports_services_vulnerabilities_output
         logger.warning(f"processed_output has {len(processed_output)} tokens.")
@@ -353,15 +371,13 @@ class DarkGPT:
     # Método para formatear el historial de mensajes incluyendo la salida de una llamada a función.
     @timer
     def process_history_with_function_output(
-            self, messages: list, function_output: str
+        self, messages: list, function_output: str
     ):
         history_json = (
             []
         )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
         # Agrega la salida de la función al historial.
-        history_json.append(
-            {"role": "system", "content": AgentPrompt + json.dumps(function_output)}
-        )
+        history_json.append({"role": "system", "content": json.dumps(function_output)})
         for message in messages:
             # Formatea los mensajes basándose en el rol.
             if "USER" in message:
@@ -383,10 +399,30 @@ class DarkGPT:
     @timer
     def GPT_with_function_output(self, historial: dict, callback=None):
         # Ejecuta la llamada a la función y obtiene su salida.
-
+        self.initialize_agent_prompt()
         self.process_nmap_reconnaissance(historial)
         self.process_nmap_ports_services_vulnerabilities(historial)
         self.process_nmap_ports_systems_services(historial)
+
+    def initialize_agent_prompt(self, callback=None):
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": AgentPrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
 
     @timer
     def GPT_with_command_output(self, historial, callback=None):
@@ -396,7 +432,7 @@ class DarkGPT:
             historial, output_command
         )
 
-        message = self.model.invoke(
+        message = self.model_chat_openai.invoke(
             [HumanMessage(content=historial_json[0]["content"])]
         )
 
@@ -419,7 +455,6 @@ class DarkGPT:
         historial_json = self.process_history_with_function_output(
             historial, function_output
         )
-
         message = self.invoke_model_with_chunks(historial_json)
 
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
@@ -483,7 +518,7 @@ class DarkGPT:
 
     @timer
     def process_deHashed_Call(self, historial):
-        function_output = self.execute_function_call(historial[-1].get("USUARIO", ""))
+        function_output = self.execute_function_call(historial[-1].get("USER", ""))
         historial_json = self.process_history_with_function_output(
             historial, function_output
         )

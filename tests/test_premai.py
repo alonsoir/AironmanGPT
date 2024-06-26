@@ -14,13 +14,13 @@ system_prompt = "You are a helpful assistant."
 session_id = "my-session"
 temperature = 0.7
 query = "Quien ganó el mundial de Sudafrica en 2010?"
-messages = [
+messages_premai = [
     {"role": "user", "content": query},
 ]
 
 response = client.chat.completions.create(
     project_id=project_id,
-    messages=messages,
+    messages=messages_premai,
     model=model,
     system_prompt=system_prompt,
     session_id=session_id,
