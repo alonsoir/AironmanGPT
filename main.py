@@ -28,11 +28,9 @@ def test_openai_api():
     if not api_key:
         logger.debug("API key is missing.")
         return
-    """
-    logger.debug(
-        f"Using OpenAI API key: {api_key} and {model_name_test} model as a test."
-    )
-    """
+    logger.debug("API key is present.")
+    logger.debug(f"Using OpenAI API key: {api_key} and {model_name_test} model as a test.")
+
     logger.debug(
         f"I will to try to use the model {model_name} and {model_name_test} model as a test."
     )

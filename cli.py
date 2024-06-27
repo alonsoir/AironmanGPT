@@ -32,13 +32,15 @@ class ConversationalShell:
             "for you."
         )
         logger.start(self.name_session)
+
+        patron_command = r"^command=(.*)"
+        patron_target = r"^target=(.*)"
+        allowed_bash_commands = ["ls", "whoami"]  # Lista de comandos permitidos en bash
+        self.darkgpt.initialize_agent_prompt()
         logger.info(initial_message)
-        patron_command = r"command=(.*)"
-        patron_target = r"target=(.*)"
-        patron_command_not_send = r".*"
+
         try:
             while True:
-
                 logger.info(
                     "Type 'exit' to finish, 'clear' to clear the screen.\n"
                     "'command=some command'\n"
@@ -48,10 +50,10 @@ class ConversationalShell:
                 logger.info(
                     f"A file named {self.name_session} has been created with the logs of the session.\n"
                 )
-                user_input = input("> ")  # Solicita entrada del usuario.
+                user_input = input(
+                    "> ").strip()  # Solicita entrada del usuario y elimina espacios en blanco al inicio y final
 
                 if user_input.lower() == "exit":
-
                     # Termina la sesión si el usuario escribe 'exit'.
                     logger.info(
                         f"Session ended. check the log file for details. {self.name_session}"
@@ -62,31 +64,25 @@ class ConversationalShell:
                     # Limpia la pantalla si el usuario escribe 'clear'.
                     os.system("cls" if os.name == "nt" else "clear")
                     continue
-                coincidencia_patron_command_not_send = re.search(
-                    patron_command_not_send, user_input.lower()
-                )
-                coincidencia_patron_command = re.search(
-                    patron_command, user_input.lower()
-                )
-                coincidencia_patron_target = re.search(
-                    patron_target, user_input.lower()
-                )
 
-                if coincidencia_patron_command_not_send:
-                    # Extraer el comando
-                    comando = coincidencia_patron_command_not_send.string.strip()
-                    logger.info(f"Ejecutando comando: {comando}")
-                    self.ProcessCommand(comando, send_output=False)
+                # Verificar si el usuario ingresó un comando específico permitido en bash
+                if any(user_input.startswith(cmd) for cmd in allowed_bash_commands):
+                    logger.info(f"Ejecutando comando en bash: {user_input}")
+                    os.system(user_input)
+                    continue
 
-                if coincidencia_patron_command:
-                    # Extraer el comando
-                    comando = coincidencia_patron_command.group(1).strip()
-                    logger.info(f"Ejecutando comando: {comando}")
-                    self.ProcessCommand(comando, send_output=True)
+                # Verificar si el usuario ingresó un comando para enviar al LLM
+                match_command = re.match(patron_command, user_input)
+                if match_command:
+                    comando_llm = match_command.group(1).strip()
+                    logger.info(f"Enviando comando al LLM: {comando_llm}")
+                    self.ProcessCommand(comando_llm, send_output=True)
+                    continue
 
-                if coincidencia_patron_target:
-                    # Extraer el target
-                    target = coincidencia_patron_target.group(1).strip()
+                # Verificar si el usuario ingresó un target para procesar
+                match_target = re.match(patron_target, user_input)
+                if match_target:
+                    target = match_target.group(1).strip()
                     if target.lower() == "localhost" or target == "127.0.0.1":
                         logger.info("Target es localhost")
                         comando = "curl -s ifconfig.me | sed 's/%$//'"
@@ -109,6 +105,12 @@ class ConversationalShell:
                     else:
                         logger.info(f"Target es: {target}")
                         self.ProcessInput(target)
+                    continue
+
+                # Si no se cumple ninguna de las condiciones anteriores, procesar como entrada normal al LLM
+                logger.info(f"Mensaje en lenguaje natural: {user_input}")
+                responses = self.darkgpt.invoke_model_with_chunks(user_input)
+                logger.info(responses)
 
         except KeyboardInterrupt as k:
             # Maneja la interrupción por teclado para terminar la sesión.

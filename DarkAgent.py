@@ -239,11 +239,13 @@ class DarkGPT:
             content = historial_json[0]["content"]
         if type(historial_json[0]) is dict:
             content = historial_json[0]["content"]
+        if type(historial_json[0]) is str:
+            content = historial_json
 
-        logger.info(f"content: {content}")
         max_tokens_limit = (
             self.max_tokens - 1000
         )  # Reduce ligeramente para dar margen de seguridad
+        logger.info(f"Sending message to llm...")
         logger.info(f"length of content: {len(content)}")
         logger.info(f"max tokens: {max_tokens_limit}")
         chunks = chunk_message(content, max_tokens_limit)
@@ -399,12 +401,12 @@ class DarkGPT:
     @timer
     def GPT_with_function_output(self, historial: dict, callback=None):
         # Ejecuta la llamada a la función y obtiene su salida.
-        self.initialize_agent_prompt()
         self.process_nmap_reconnaissance(historial)
         self.process_nmap_ports_services_vulnerabilities(historial)
         self.process_nmap_ports_systems_services(historial)
 
     def initialize_agent_prompt(self, callback=None):
+        logger.warning("Initialize agent prompt")
         """
         Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
         conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
