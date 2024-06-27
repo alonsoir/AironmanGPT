@@ -1,3 +1,4 @@
+# Usar la imagen base de Python
 FROM python:3.12.4-slim-bullseye AS builder
 
 # Establecer el directorio de trabajo
@@ -9,9 +10,6 @@ COPY .env .env
 # Usar el archivo .env para configurar las variables de entorno
 ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
-
-# Agregar el archivo .env a .bashrc
-RUN echo "source /app/.env" >> /etc/bash.bashrc
 
 # Actualizar lista de paquetes e instalar dependencias
 RUN apt-get update && \
@@ -26,7 +24,9 @@ RUN apt-get update && \
     tshark \
     ngrep \
     tcpdump \
-    net-tools && \
+    net-tools \
+    libcap2-bin \
+    sudo && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -39,6 +39,9 @@ RUN echo "wireshark-common wireshark-common/install-setuid boolean true" | debco
 RUN chmod +x /usr/bin/dumpcap && \
     setcap cap_net_raw,cap_net_admin=eip /usr/bin/dumpcap
 
+# Asignar las capacidades necesarias a Nmap
+RUN setcap cap_net_raw,cap_net_admin+eip /usr/bin/nmap
+
 # Crear un usuario no root y establecer directorios
 RUN useradd --create-home appuser && \
     mkdir -p /home/appuser/app /home/appuser/app/prompts /home/appuser/app/logs /home/appuser/app/pcap /home/appuser/app/nmap /home/appuser/.cache/pypoetry && \
@@ -46,6 +49,9 @@ RUN useradd --create-home appuser && \
 
 # Añadir el usuario al grupo wireshark
 RUN usermod -aG wireshark appuser
+
+# Permitir que el usuario appuser use sudo sin contraseña (opcional, pero útil para pruebas)
+RUN echo "appuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Cambiar al usuario no root
 USER appuser
@@ -72,5 +78,6 @@ COPY --chown=appuser:appuser ./tools/tshark_nmap.py ./tools/tools.py ./tools/nma
 COPY --chown=appuser:appuser cli.py dehashed_api.py DarkAgent.py darkgpt.py functions.py main.py /home/appuser/app/
 COPY --chown=appuser:appuser ./prompts/agent_prompt.txt /home/appuser/app/prompts/agent_prompt.txt
 COPY --chown=appuser:appuser ./prompts/router_prompt.txt /home/appuser/app/prompts/router_prompt.txt
+
 # Establecer el punto de entrada para poetry run
 ENTRYPOINT ["poetry", "run", "python3", "main.py"]

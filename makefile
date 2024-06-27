@@ -4,7 +4,7 @@ setup: requirements install_python install validate_python_libs
 
 container: container-build container-vulns size container-run
 
-container-non-bash: container-build-non-bash container-vulns size container-run-non-bash
+container-non-bash: container-build-non-bash container-vulns-non-bash size container-run-non-bash
 code:
 	poetry run code .
 
@@ -73,6 +73,7 @@ container-vulns:
 	docker scout recommendations aironman/aironmangpt:0.0.1
 	docker scout quickview aironman/aironmangpt:0.0.1 --org aironman
 
+container-vulns-non-bash:
 	docker scout quickview aironman/aironmangpt-non-bash:0.0.1
 	docker scout cves aironman/aironmangpt-non-bash:0.0.1
 	docker scout recommendations aironman/aironmangpt-non-bash:0.0.1
