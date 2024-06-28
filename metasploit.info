@@ -1,0 +1,8 @@
+This will install Metasploit Framework and its dependencies on your Mac.
+The framework itself will be installed under /opt/metasploit-framework/framework.
+Convenience wrappers for the commands are installed under /opt/metasploit-framework/bin,
+which can be added to your PATH environment variable.
+If you want to use a database with the framework, you can use the 'msfdb' command to configure, start and stop it.
+Run '/opt/metasploit-framework/bin/msfdb' for more information.
+If you are interested in Metasploit Framework development, see the Github Project and the Development Wiki.
+Thank you for using Metasploit! Have a fantastic day!

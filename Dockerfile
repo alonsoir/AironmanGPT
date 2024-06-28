@@ -76,7 +76,11 @@ RUN poetry install --no-root --no-dev
 # Copiar los archivos de la aplicación
 COPY --chown=appuser:appuser ./tools/tshark_nmap.py ./tools/tools.py ./tools/nmap_recognition.py ./tools/
 COPY --chown=appuser:appuser cli.py dehashed_api.py DarkAgent.py darkgpt.py functions.py main.py /home/appuser/app/
-COPY --chown=appuser:appuser prompts/initialize_agent_prompt.txt /home/appuser/app/prompts/agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/initialize_agent_prompt.txt /home/appuser/app/prompts/initialize_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/metasploit_agent_prompt.txt /home/appuser/app/prompts/metasploit_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/ports_services_vulnerabilities_agent_prompt.txt /home/appuser/app/prompts/ports_services_vulnerabilities_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/ports_system_services_agent_prompt.txt /home/appuser/app/prompts/ports_system_services_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/recoinassance_agent_prompt.txt /home/appuser/app/prompts/recoinassance_agent_prompt.txt
 COPY --chown=appuser:appuser ./prompts/router_prompt.txt /home/appuser/app/prompts/router_prompt.txt
 
 # Establecer el punto de entrada para poetry run

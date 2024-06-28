@@ -32,7 +32,7 @@ logger.start(name_session)
 # Definición de los prompts que se utilizarán para generar las respuestas del modelo.
 # Prompts para el agente
 # Leer el contenido del archivo en la variable AgentPrompt
-file_path_agent_prompt = "prompts/initialize_agent_prompt.txt"
+file_path_agent_prompt = "./prompts/initialize_agent_prompt.txt"
 with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
     AgentPrompt = file_agent.read()
 
@@ -40,15 +40,15 @@ file_path_router_prompt = "./prompts/router_prompt.txt"
 with open(file_path_router_prompt, "r", encoding="utf-8") as file_router:
     RouterPrompt = file_router.read()
 
-file_path_agent_prompt = "prompts/recoinassance_agent_prompt.txt"
+file_path_agent_prompt = "./prompts/recoinassance_agent_prompt.txt"
 with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
     RecoinassancePrompt = file_agent.read()
 
-file_path_agent_prompt = "prompts/ports_services_vulnerabilities_agent_prompt.txt"
+file_path_agent_prompt = "./prompts/ports_services_vulnerabilities_agent_prompt.txt"
 with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
     PortsServicesVulnerabilitiesPrompt = file_agent.read()
 
-file_path_agent_prompt = "prompts/ports_system_services_agent_prompt.txt"
+file_path_agent_prompt = "./prompts/ports_system_services_agent_prompt.txt"
 with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
     PortsSystemServicesPrompt = file_agent.read()
 
@@ -160,7 +160,6 @@ class DarkGPT:
         self.premai_project_id = os.getenv("PREMAI_PROJECT_ID")
         # mythalion-13b # remm-slerp-l2-13b
         self.model_name_premai = os.getenv("PREMAI_MODEL")
-        os.getenv("PREMAI_SYSTEM_PROMPT")
         self.premai_system_prompt = os.getenv("PREMAI_SYSTEM_PROMPT")
         self.premai_session_id = os.getenv("PREMAI_SESSION_ID")
         self.premai_temperature = float(os.getenv("PREMAI_TEMPERATURE"))
@@ -246,14 +245,17 @@ class DarkGPT:
         return str(processed_output)
 
     def invoke_model_with_chunks(self, historial_json):
-        if type(historial_json[0]) is SystemMessage:
-            content = historial_json[0].content[0]['content']
-        if type(historial_json[0]) is HumanMessage:
-            content = historial_json[0]["content"]
-        if type(historial_json[0]) is dict:
-            content = historial_json[0]["content"]
-        if type(historial_json[0]) is str:
+        """
+        Invoca el modelo con el historial de mensajes.
+        """
+        if type(historial_json) is str or len(historial_json)> 0 and type(historial_json[0]) is str:
             content = historial_json
+        if len(historial_json)> 0 and type(historial_json[0]) is SystemMessage:
+            content = historial_json[0].content[0]['content']
+        if len(historial_json)> 0 and type(historial_json[0]) is HumanMessage:
+            content = historial_json[0]["content"]
+        if len(historial_json)> 0 and type(historial_json[0]) is dict:
+            content = historial_json[0]["content"]
 
         max_tokens_limit = (
             self.max_tokens - 1000
@@ -269,7 +271,14 @@ class DarkGPT:
             for chunk in chunks:
                 logger.info(f"length of chunk: {len(chunk)}")
                 message = self.invoke_with_retry(chunk)
-                responses.append(message)
+                if type(message) is str:
+                    responses.append(message)
+                if type(message) is list:
+                    responses.extend(message)
+                if type(message) is dict:
+                    for msg in message:
+                        responses.append(msg.message.content)
+                    responses.append(message)
         except Exception as e:
             logger.error(f"Error invoking doing chunks: {e}")
             pass
@@ -297,7 +306,9 @@ class DarkGPT:
                         session_id=self.premai_session_id,
                         temperature=self.premai_temperature,
                     )
-                    return message.choices[0].message.content
+                    # message.choices[0].message.content es un string, pero el mensaje puede ser mayor, por lo que
+                    # hay que coger el dictionary message.choicesy extraer el contenido.
+                    return message.choices
                 elif self.default_engine == "openai-api":
                     try:
                         message = self.model_chat_openai.invoke(

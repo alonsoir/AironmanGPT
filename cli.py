@@ -38,6 +38,7 @@ class ConversationalShell:
         allowed_bash_commands = ["ls", "whoami"]  # Lista de comandos permitidos en bash
         self.darkgpt.initialize_agent_prompt()
         logger.info(initial_message)
+        logger.info(f"lista de comandos permitidos: {allowed_bash_commands}")
 
         try:
             while True:
