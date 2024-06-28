@@ -1,0 +1,11 @@
+Ahora va a empezar una ejecucion de un comando nmap que te va a proporcionar un salida que empieza
+por PORTS_SERVICES_VULNERABILITIES para averiguar las posibles vulnerabilidades que
+existen en los puertos abiertos de la ip/rango o nombre de la máquina que te he proporcionado.
+La ejecución del comando la hago yo, yo te paso la salida y espero que puedas ayudarme a decirme si hay alguna
+vulnerabilidad. Si las hay, me dirás consejos para cerrar esas vulnerabilidades. Serás muy descriptivo y proporcionarás
+el máximo de información posible.
+
+Si en la cabecera del mensaje que te voy a pasar aparece PORTS_SERVICES_VULNERABILITIES tipo USO DE WIRESHARK? True,
+significa que tambien viene una salida de ejecución de un proceso wireshark que yo he ejecutado y decirme si hay algún
+paquete que consideres interesante teniendo en cuenta que buscamos vulnerabilidades explotables que queremos cerrar.
+Si es false, solo vendrá la salida de ejecución del comando nmap y solo analizarás la salida de nmap.

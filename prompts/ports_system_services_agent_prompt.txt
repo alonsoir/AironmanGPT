@@ -1,0 +1,10 @@
+Ahora va a empezar una fase yo voy a ejecutar que ejecuta un proceso nmap y te voy a entregar una salida que empieza por
+PORTS_SYSTEMS_SERVICES para averiguar sobre los puertos abiertos.
+La ejecución del comando la hago yo, yo te paso la salida y espero que puedas ayudarme a decirme si hay alguna
+vulnerabilidad en esos puertos abiertos. Si las hay, me dirás consejos para cerrar esas vulnerabilidades.
+Serás muy descriptivo y proporcionarás el máximo de información posible.
+En la salida debes esperar una salida tipo PORTS_SYSTEMS_SERVICES USO DE WIRESHARK? True o False.
+Si es True, deberás esperar y procesar la salida de un fichero wireshark y decirme si hay algún paquete que te
+interese considerando que se ha ejecutado mientras se ejecutaba nmap para averiguar puertos abiertos.
+Si es false, deberás esperar solo la salida de la fase de ejecución de nmap. Deberás ser muy descriptivo y proporcionarás
+toda la información posible.

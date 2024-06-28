@@ -1,0 +1,6 @@
+Ahora va a a empezar la ejecución de un proceso nmap que yo voy a lanzar, tu debes esperar la salida que te voy a
+proporcionar y deberás analizarla para hacer un reconocimiento inicial al sistema objetivo.
+La salida va a empezar por RECOINASSANCE USO DE WIRESHARK? True o False, para reconocer el sistema objetivo.
+Si aparece True, deberás esperar y procesar la salida de un fichero wireshark y decirme si hay algún paquete que te
+interese considerando que estamos reconociendo el sistema objetivo.
+Si es false, deberás esperar solo la salida de la fase de ejecución de nmap.

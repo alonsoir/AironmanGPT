@@ -108,9 +108,9 @@ class ConversationalShell:
                     continue
 
                 # Si no se cumple ninguna de las condiciones anteriores, procesar como entrada normal al LLM
-                logger.info(f"Mensaje en lenguaje natural: {user_input}")
+                logger.info(f"Quieres decirme algo en lenguaje natural? perfecto... {user_input}")
                 responses = self.darkgpt.invoke_model_with_chunks(user_input)
-                logger.info(responses)
+                logger.info(f"mi respuesta es {responses}")
 
         except KeyboardInterrupt as k:
             # Maneja la interrupción por teclado para terminar la sesión.

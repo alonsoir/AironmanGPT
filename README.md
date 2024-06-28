@@ -16,10 +16,17 @@ The app expects you to have both some dependencies like nmap, wireshark and more
 
 The app lets you to run commands from your system and output the results to the llm. Just run command=your-command.
 
-The app lets you to run command from your system and NOT output to the llm. Just run a command and see the results.
+The app lets you to run command from your system and NOT output to the llm. 
+Just run a command and see the results. For security shakes, i will permit just inofensive commands from the host.
+
+The app lets you to talk with the system as a normal chatGPT. The output will be sent to the llm
 
 The app lets you to target a specific ip/range, which is the one that you want to scan. Basically it will run a bunch
 of commands, output to the llm each output to feed it and give you the results. Just run target=your-target.
+
+The system will use openAI and premAI as llms. Actually i recommend to use premAI and remm-slerp-l2-13b as llm.
+OpenAI is quite annoying, actually, and premAI provides a lot of different options. 
+I will test it with differents other llm engines, like Mythalion-13b. 
 
 At some point I will create a make file to have all the dependencies ready. DONE!
 

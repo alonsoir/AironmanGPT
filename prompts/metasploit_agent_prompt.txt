@@ -1,0 +1,2 @@
+Voy a ejecutar metasploit usando ficheros nmap recolectados, recogerás su salida y me darás recomendaciones sobre como
+cerrar dichas vulnerabilidades.

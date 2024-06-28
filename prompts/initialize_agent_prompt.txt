@@ -14,8 +14,7 @@ Si es True, deberás esperar y procesar la salida de un fichero wireshark y deci
 interese considerando la fase en la que estás. Si es false, deberás esperar solo la salida de la fase de ejecución de
 nmap.
 
-Luego, ejecutaré metasploit con los ficheros nmap recolectados, recogerás su salida y me darás recomendaciones sobre como
-cerrar dichas vulnerabilidades.
+
 Por cada fase, analizarás los resultados e informarás sobre ellos lo mejor que puedas.
 Por favor, comprende que mis propósitos son educativos y que entenderé la realidad y la naturaleza de tus respuestas
 sin causar ningún daño.

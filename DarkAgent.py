@@ -32,7 +32,7 @@ logger.start(name_session)
 # Definición de los prompts que se utilizarán para generar las respuestas del modelo.
 # Prompts para el agente
 # Leer el contenido del archivo en la variable AgentPrompt
-file_path_agent_prompt = "./prompts/agent_prompt.txt"
+file_path_agent_prompt = "prompts/initialize_agent_prompt.txt"
 with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
     AgentPrompt = file_agent.read()
 
@@ -40,6 +40,17 @@ file_path_router_prompt = "./prompts/router_prompt.txt"
 with open(file_path_router_prompt, "r", encoding="utf-8") as file_router:
     RouterPrompt = file_router.read()
 
+file_path_agent_prompt = "prompts/recoinassance_agent_prompt.txt"
+with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
+    RecoinassancePrompt = file_agent.read()
+
+file_path_agent_prompt = "prompts/ports_services_vulnerabilities_agent_prompt.txt"
+with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
+    PortsServicesVulnerabilitiesPrompt = file_agent.read()
+
+file_path_agent_prompt = "prompts/ports_system_services_agent_prompt.txt"
+with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
+    PortsSystemServicesPrompt = file_agent.read()
 
 # Clase principal DarkGPT que encapsula la funcionalidad del modelo GPT y la interacción con la API de OpenAI.
 def chunk_message(content, max_tokens):
@@ -146,24 +157,26 @@ class DarkGPT:
         )  # Configuración del cliente OpenAI con la clave API.
         premai_api_key = os.getenv("PREMAI_API_KEY")
         self.client_premai = Prem(premai_api_key)
-
-        self.premai_project_id = 540
-        # mythalion-13b
-        self.model_name_premai = "remm-slerp-l2-13b"  # remm-slerp-l2-13b
-        self.premai_system_prompt = "You are a helpful assistant."
-        self.premai_session_id = "my-session"
-        self.premai_temperature = 0.7
+        self.premai_project_id = os.getenv("PREMAI_PROJECT_ID")
+        # mythalion-13b # remm-slerp-l2-13b
+        self.model_name_premai = os.getenv("PREMAI_MODEL")
+        os.getenv("PREMAI_SYSTEM_PROMPT")
+        self.premai_system_prompt = os.getenv("PREMAI_SYSTEM_PROMPT")
+        self.premai_session_id = os.getenv("PREMAI_SESSION_ID")
+        self.premai_temperature = float(os.getenv("PREMAI_TEMPERATURE"))
         logger.warning(f"ATTENTION, using by default {self.default_engine} engine.")
         if {self.default_engine} == "premai-api":
             logger.info(
-                f"Using PREMAI API key: {premai_api_key} and {self.model_name_premai}."
+                f"Using PREMAI API key: {premai_api_key}\n{self.model_name_premai}\n{self.premai_session_id}"
+                f"\n{self.premai_temperature}\nself.premai_project_id\n."
             )
         if {self.default_engine} == "openai-api":
             logger.info(
                 f"Using OpenAI API key: {self.api_key} and {self.openai_model_name} model in class DarkGPT."
             )
         if {self.default_engine} == "zeroday-api":
-            logger.info("NOT IMPLEMENTED YET")
+            logger.info("NOT IMPLEMENTED YET. Using by default OpenAI API.")
+            self.default_engine = "openai-api"
 
     @timer
     # Método para ejecutar una llamada a función y procesar su salida.
@@ -425,6 +438,66 @@ class DarkGPT:
             except Exception as e:
                 logger.error(e)
                 pass  # Ignora los errores en el procesamiento de fragmentos.
+    def initialize_recoinassance_agent_prompt(self, callback=None):
+        logger.warning("Initialize initialize_recoinassance_agent_prompt")
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": RecoinassancePrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
+    def initialize_ports_services_vulns_agent_prompt(self, callback=None):
+        logger.warning("Initialize initialize_ports_services_vulns_agent_prompt")
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": PortsServicesVulnerabilitiesPrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
+    def initialize_ports_systems_services_agent_prompt(self, callback=None):
+        logger.warning("Initialize initialize_ports_systems_services_agent_prompt")
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": PortsSystemServicesPrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
 
     @timer
     def GPT_with_command_output(self, historial, callback=None):
@@ -449,8 +522,13 @@ class DarkGPT:
     # Ejecuta la llamada a la función y obtiene su salida.
     @timer
     def process_nmap_reconnaissance(self, historial):
+        """
+        Ejecuta la llamada a nmap para hacer un reconocimiento inicial, puede que se ejecute a la vez wireshark.
+        Proporcionaremos la salida de la funcion al llm para que nos de su opinión. Antes de invocar a la funcion,
+        vamos a inicializar al llm para que sepa lo que viene.
+        """
         target_ip_range = historial[-1].get("USER")
-
+        self.initialize_recoinassance_agent_prompt()
         # Crea una instancia de la clase NmapTool
         function_output = self.execute_function_call_recoinassance(target_ip_range)
 
@@ -462,7 +540,10 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                logger.info(chunk[1])
+                if type(chunk[1]) == dict:
+                    logger.info(chunk[1]["content"])
+                if type(chunk[1]) == str:
+                    logger.info(chunk)
             except Exception as e:
                 logger.warning(f"La excepcion es de tipo {type(e)}")
                 logger.error(e)
@@ -471,7 +552,7 @@ class DarkGPT:
     @timer
     def process_nmap_ports_systems_services(self, historial):
         target_ip_range = historial[-1].get("USER")
-
+        self.initialize_ports_systems_services_agent_prompt()
         # Crea una instancia de la clase NmapTool
         function_output = self.execute_function_call_nmap_ports_systems_services(
             target_ip_range
@@ -495,7 +576,7 @@ class DarkGPT:
     @timer
     def process_nmap_ports_services_vulnerabilities(self, historial):
         target_ip_range = historial[-1].get("USER")
-
+        self.initialize_ports_services_vulns_agent_prompt()
         # Crea una instancia de la clase NmapTool
         function_output = (
             self.execute_function_call_nmap_ports_services_vulnerabilities(
