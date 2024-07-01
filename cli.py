@@ -35,7 +35,7 @@ class ConversationalShell:
 
         patron_command = r"^command=(.*)"
         patron_target = r"^target=(.*)"
-        allowed_bash_commands = ["ls", "whoami"]  # Lista de comandos permitidos en bash
+        allowed_bash_commands = ["ls", "whoami", "nmap", "tshark", "msfconsole"]  # Lista de comandos permitidos en bash
         self.darkgpt.initialize_agent_prompt()
         logger.info(initial_message)
         logger.info(f"lista de comandos permitidos: {allowed_bash_commands}")
@@ -102,7 +102,7 @@ class ConversationalShell:
                             self.ProcessInput(resultado.stdout)
                         except Exception as e:
                             logger.error(f"Error al ejecutar el comando: {str(e)}")
-                            self.ProcessInput(target)
+                            #self.ProcessInput(target)
                     else:
                         logger.info(f"Target es: {target}")
                         self.ProcessInput(target)
@@ -132,7 +132,6 @@ class ConversationalShell:
                 resultado.stdout if resultado.returncode == 0 else resultado.stderr
             )
             if resultado.returncode == 0 and send_output:
-
                 def handle_chunk(chunk_content):
                     """
                     Función interna para manejar los fragmentos de contenido devueltos por DarkGPT.

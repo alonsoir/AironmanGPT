@@ -20,18 +20,31 @@ from openai import (
     NotFoundError,
 )
 from premai import Prem
-
+from premai.models.response_choice import ResponseChoice
 from dehashed_api import consultar_dominio_dehashed
 from functions import Leak_Function
 from tools.tools import timer, str_to_bool
 from tools.tshark_nmap import NetworkScanner
+from tools.metasploit import Metasploit
 
 name_session = f"session-{date.today()}.log"
 logger.start(name_session)
 
 # Definición de los prompts que se utilizarán para generar las respuestas del modelo.
-# Prompts para el agente
-# Leer el contenido del archivo en la variable AgentPrompt
+
+file_path_agent_prompt = "./prompts/metasploit_reconn_agent_prompt.txt"
+with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
+    MSReconnAgentPrompt = file_agent.read()
+
+file_path_agent_prompt = "./prompts/metasploit_ports_systems_services_agent_prompt.txt"
+with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
+    MSPortsSystemServicesAgentPrompt = file_agent.read()
+
+file_path_agent_prompt = "./prompts/metasploit_ports_services_vulns_agent_prompt.txt"
+with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
+    MSPortsServicesVulnsAgentPrompt = file_agent.read()
+
+
 file_path_agent_prompt = "./prompts/initialize_agent_prompt.txt"
 with open(file_path_agent_prompt, "r", encoding="utf-8") as file_agent:
     AgentPrompt = file_agent.read()
@@ -149,6 +162,8 @@ class DarkGPT:
             self.initial_wait,
             self.capture_duration,
         )
+        self.metasploit = Metasploit()
+
         self.functions = (
             Leak_Function  # Funciones personalizadas para que el modelo las utilice.
         )
@@ -429,6 +444,10 @@ class DarkGPT:
         self.process_nmap_ports_services_vulnerabilities(historial)
         self.process_nmap_ports_systems_services(historial)
 
+        self.process_metasploit_reconnaissance(historial)
+        self.process_metasploit_ports_services_vulnerabilities(historial)
+        self.process_metasploit_ports_systems_services(historial)
+
     def initialize_agent_prompt(self, callback=None):
         logger.warning("Initialize agent prompt")
         """
@@ -449,6 +468,27 @@ class DarkGPT:
             except Exception as e:
                 logger.error(e)
                 pass  # Ignora los errores en el procesamiento de fragmentos.
+    def initialize_metasploit_recoinassance_agent_prompt(self, callback=None):
+        logger.warning("Initialize initialize_recoinassance_agent_prompt")
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": MSReconnAgentPrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
+
     def initialize_recoinassance_agent_prompt(self, callback=None):
         logger.warning("Initialize initialize_recoinassance_agent_prompt")
         """
@@ -530,6 +570,39 @@ class DarkGPT:
                 logger.error(e)
                 pass  # Ignora los errores en el procesamiento de fragmentos.
 
+    def process_metasploit_ports_services_vulnerabilities(self, historial):
+        pass
+
+    def process_metasploit_ports_systems_services(self, historial):
+        pass
+    def process_metasploit_reconnaissance(self, historial):
+        """
+        voy a ejecutar metasploit con la salida xml que ha generado process_nmap_reconnaissance
+        """
+        target_ip_range = historial[-1].get("USER")
+        self.initialize_metasploit_recoinassance_agent_prompt()
+
+        function_output = self.metasploit.run_msf_recon()
+
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
+        )
+        message = self.invoke_model_with_chunks(historial_json)
+
+        # Itera a través de los fragmentos de respuesta e imprime el contenido.
+        for chunk in message:
+            try:
+                if (type(chunk) == ResponseChoice):
+                    logger.info(chunk.message.content)
+                if (type(chunk) == dict and len(chunk) > 0):
+                    logger.info(chunk[1]["content"])
+                if type(chunk) == str:
+                    logger.info(chunk)
+            except Exception as e:
+                logger.warning(f"La excepcion es de tipo {type(e)}")
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
+
     # Ejecuta la llamada a la función y obtiene su salida.
     @timer
     def process_nmap_reconnaissance(self, historial):
@@ -551,9 +624,11 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                if type(chunk[1]) == dict:
+                if (type(chunk) == ResponseChoice):
+                    logger.info(chunk.message.content)
+                if (type(chunk) == dict and len(chunk) > 0):
                     logger.info(chunk[1]["content"])
-                if type(chunk[1]) == str:
+                if type(chunk) == str:
                     logger.info(chunk)
             except Exception as e:
                 logger.warning(f"La excepcion es de tipo {type(e)}")
@@ -578,7 +653,12 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                logger.info(chunk[1])
+                if (type(chunk) == ResponseChoice):
+                    logger.info(chunk.message.content)
+                if (type(chunk) == dict and len(chunk) > 0):
+                    logger.info(chunk[1]["content"])
+                if type(chunk) == str:
+                    logger.info(chunk)
             except Exception as e:
                 logger.warning(f"La excepcion es de tipo {type(e)}")
                 logger.error(e)
@@ -604,7 +684,12 @@ class DarkGPT:
         # Itera a través de los fragmentos de respuesta e imprime el contenido.
         for chunk in message:
             try:
-                logger.info(chunk[1])
+                if (type(chunk) == ResponseChoice):
+                    logger.info(chunk.message.content)
+                if (type(chunk) == dict and len(chunk) > 0):
+                    logger.info(chunk[1]["content"])
+                if type(chunk) == str:
+                    logger.info(chunk)
             except Exception as e:
                 logger.warning(f"La excepcion es de tipo {type(e)}")
                 logger.error(e)

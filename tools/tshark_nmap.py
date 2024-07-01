@@ -136,8 +136,8 @@ class NetworkScanner:
         )
         global raw
         raw = ""
-        file_to = "./nmap/file_nmap_reconnaissance.nmap"
-        command = f"nmap -T4 -sT -sV -sC --top-ports 1000 -oN {file_to} --open --version-trace --script-timeout 10000 {target_ip_range}"
+        file_to = "./nmap/file_nmap_reconnaissance.xml"
+        command = f"nmap -T4 -sT -sV -sC --top-ports 1000 -oX {file_to} --open --version-trace --script-timeout 10000 {target_ip_range}"
         logger.info(f"Running {command}\n")
         header = f"capture_then_dispatch_nmap_reconnaissance. {target_ip_range}\n"
         capture_then_dispatch_nmap_reconnaissance = header + self.dispatch_tool(
@@ -218,8 +218,8 @@ class NetworkScanner:
         logger.info(
             f"capture_then_dispatch_nmap_ports_systems_services {capture} {target_ip_range}"
         )
-        file_to = "./nmap/file_nmap_ports_systems_services.nmap"
-        command = f"nmap -sT -T4 -p- {target_ip_range} -oN {file_to}"
+        file_to = "./nmap/file_nmap_ports_systems_services.xml"
+        command = f"nmap -sT -T4 -p- {target_ip_range} -oX {file_to}"
         logger.info(f"Running {command}\n")
         logger.info("Be patient please...\n")
         header = (
@@ -296,8 +296,8 @@ class NetworkScanner:
 
         global raw
         raw = ""
-        file_to = "./nmap/file_nmap_ports_services_vulnerabilities.nmap"
-        command = f"nmap -sT -sV --script vuln -T4 -p- {target_ip_range} -oN {file_to}"
+        file_to = "./nmap/file_nmap_ports_services_vulnerabilities.xml"
+        command = f"nmap -sT -sV --script vuln -T4 -p- {target_ip_range} -oX {file_to}"
         logger.info(f"Running {command}\n")
         logger.info("Be patient please...\n")
         header = f"capture_then_dispatch_nmap_ports_services_vulnerabilities.{target_ip_range}\n"

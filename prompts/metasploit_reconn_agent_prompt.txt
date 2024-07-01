@@ -1,0 +1,2 @@
+Voy a ejecutar metasploit usando el fichero que he obtenido mediante nmap llamado file_nmap_reconnaissance.xml.
+Recogerás su salida y me darás recomendaciones sobre como cerrar dichas vulnerabilidades.

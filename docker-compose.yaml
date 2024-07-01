@@ -1,7 +1,23 @@
-version: '3.8'
+version: '3'
+
 services:
   aironmangpt:
     build: .
     env_file:
       - .env
-    command: /bin/bash
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+    command: ["/bin/bash", "-c", "msfdb init && poetry run python3 main.py"]
+  postgres:
+    image: postgres:13
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
