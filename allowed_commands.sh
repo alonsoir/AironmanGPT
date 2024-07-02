@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/bin/sh.bak
 # Lista de comandos permitidos
 ALLOWED_COMMANDS="ls nmap tshark curl msfconsole poetry"
 

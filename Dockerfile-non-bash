@@ -109,9 +109,6 @@ RUN chmod +x /usr/local/bin/allowed_commands.sh
 # Reemplazar /bin/sh con busybox para permitir solo comandos específicos
 RUN mv /bin/sh /bin/sh.bak && ln -s /usr/local/bin/allowed_commands.sh /bin/sh
 
-# Eliminar shells interactivas como bash usando /bin/sh.bak
-RUN /bin/sh.bak -c "chmod -x /bin/bash"
-
 # Volver al usuario no root
 USER appuser
 
