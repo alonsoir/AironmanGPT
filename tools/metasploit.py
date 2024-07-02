@@ -1,16 +1,21 @@
+import os
 import subprocess
-import sys
-import time
 
 from loguru import logger
 
 from tools.tools import timer
+import platform
+
 
 class Metasploit:
 
     def __init__(self):
-        self.metasploit_cmd = "/opt/metasploit-framework/bin/msfconsole"
+        if platform.system() == "Darwin":
+            self.metasploit_cmd = os.getenv("MSF_COMMAND_OSX")
+        else:
+            self.metasploit_cmd = os.getenv("MSF_COMMAND")
 
+        logger.info(f"Comando a ejecutar: {self.metasploit_cmd}")
     @timer
     def run_bash_command(self, command):
         try:
@@ -34,16 +39,19 @@ class Metasploit:
     def run_msf_recon(self):
         command = f"{self.metasploit_cmd} -q -x 'db_import ./nmap/file_nmap_reconnaissance.xml; hosts; services; vulns; exit'"
         output = self.run_bash_command(command)
+        logger.info(f"Resultado de la ejecución del comando:\n {output}\n")
         return output
 
     @timer
     def run_msf_ports_systems_services(self):
         command = f"{self.metasploit_cmd} -q -x 'db_import ./nmap/file_nmap_ports_systems_services.xml; hosts; services; vulns; exit'"
         output = self.run_bash_command(command)
+        logger.info(f"{output}\n")
         return output
 
     @timer
     def run_msf_ports_services_vulns(self):
         command = f"{self.metasploit_cmd} -q -x 'db_import ./nmap/file_nmap_ports_services_vulnerabilities.xml; hosts; services; vulns; exit'"
         output = self.run_bash_command(command)
+        logger.info(f"{output}\n")
         return output

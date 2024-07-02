@@ -1,2 +1,7 @@
 Voy a ejecutar metasploit usando el fichero que he obtenido mediante nmap llamado file_nmap_ports_systems_services.xml.
-Recogerás su salida y me darás recomendaciones sobre como cerrar dichas vulnerabilidades.
+En concreto, yo voy a ejecutar el siguiente comando:
+ msfconsole -q -x 'db_import ./nmap/file_nmap_ports_systems_services.xml; hosts; services; vulns; exit'
+Como sabes, este comando importa el fichero xml que he obtenido mediante nmap y luego trata de inferir
+las vulnerabilidades que encuentre, los servicios y puertos vulnerables.
+Recogerás la salida de la ejecución del comandoy me darás recomendaciones sobre como cerrar dichas vulnerabilidades,
+si es que las hay.

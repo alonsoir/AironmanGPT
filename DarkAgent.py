@@ -489,6 +489,47 @@ class DarkGPT:
                 logger.error(e)
                 pass  # Ignora los errores en el procesamiento de fragmentos.
 
+    def initialize_metasploit_ports_systems_services_agent_prompt(self, callback=None):
+        logger.warning("Initialize initialize_recoinassance_agent_prompt")
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": MSPortsSystemServicesAgentPrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
+
+    def initialize_metasploit_ports_services_vulns_agent_prompt(self, callback=None):
+        logger.warning("Initialize initialize_recoinassance_agent_prompt")
+        """
+        Inicializa la conversacion con el prompt, que tenga un contexto inicial que se lanza una vez al iniciar la
+        conversacion. No quiero tener que mandar esto cada vez que mando una nueva salida de alguna herramienta.
+        """
+        history_json = (
+            []
+        )  # Lista inicial vacía para contener los mensajes formateados y la salida de la función.
+        # Agrega la salida de la función al historial.
+        history_json.append({"role": "system", "content": MSPortsServicesVulnsAgentPrompt})
+        logger.info(f"AgentPrompt: {history_json}\n")
+        messages = self.invoke_model_with_chunks([SystemMessage(content=history_json)])
+
+        for message in messages:
+            try:
+                logger.info(message)
+            except Exception as e:
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
     def initialize_recoinassance_agent_prompt(self, callback=None):
         logger.warning("Initialize initialize_recoinassance_agent_prompt")
         """
@@ -571,15 +612,61 @@ class DarkGPT:
                 pass  # Ignora los errores en el procesamiento de fragmentos.
 
     def process_metasploit_ports_services_vulnerabilities(self, historial):
-        pass
+        """
+                voy a ejecutar metasploit con la salida xml que ha generado process_ports_services_vulnerabilities
+        """
+        self.initialize_metasploit_ports_services_vulns_agent_prompt()
+        function_output = self.metasploit.run_msf_ports_services_vulns()
+
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
+        )
+        message = self.invoke_model_with_chunks(historial_json)
+
+        # Itera a través de los fragmentos de respuesta e imprime el contenido.
+        for chunk in message:
+            try:
+                if (type(chunk) == ResponseChoice):
+                    logger.info(chunk.message.content)
+                if (type(chunk) == dict and len(chunk) > 0):
+                    logger.info(chunk[1]["content"])
+                if type(chunk) == str:
+                    logger.info(chunk)
+            except Exception as e:
+                logger.warning(f"La excepcion es de tipo {type(e)}")
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
 
     def process_metasploit_ports_systems_services(self, historial):
-        pass
+        """
+                voy a ejecutar metasploit con la salida xml que ha generado process_nmap_reconnaissance
+                """
+        self.initialize_metasploit_ports_systems_services_agent_prompt()
+
+        function_output = self.metasploit.run_msf_ports_systems_services()
+
+        historial_json = self.process_history_with_function_output(
+            historial, function_output
+        )
+        message = self.invoke_model_with_chunks(historial_json)
+
+        # Itera a través de los fragmentos de respuesta e imprime el contenido.
+        for chunk in message:
+            try:
+                if (type(chunk) == ResponseChoice):
+                    logger.info(chunk.message.content)
+                if (type(chunk) == dict and len(chunk) > 0):
+                    logger.info(chunk[1]["content"])
+                if type(chunk) == str:
+                    logger.info(chunk)
+            except Exception as e:
+                logger.warning(f"La excepcion es de tipo {type(e)}")
+                logger.error(e)
+                pass  # Ignora los errores en el procesamiento de fragmentos.
     def process_metasploit_reconnaissance(self, historial):
         """
         voy a ejecutar metasploit con la salida xml que ha generado process_nmap_reconnaissance
         """
-        target_ip_range = historial[-1].get("USER")
         self.initialize_metasploit_recoinassance_agent_prompt()
 
         function_output = self.metasploit.run_msf_recon()

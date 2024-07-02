@@ -86,9 +86,13 @@ RUN poetry install --no-root --no-dev
 
 # Copiar los archivos de la aplicación
 COPY --chown=appuser:appuser ./tools/tshark_nmap.py ./tools/tools.py ./tools/nmap_recognition.py ./tools/
+COPY --chown=appuser:appuser ./tools/metasploit.py ./tools/chat_zero_day.py ./tools/download-model.py ./tools/
+COPY --chown=appuser:appuser ./tools/google_colab_zero.py ./tools/
 COPY --chown=appuser:appuser cli.py dehashed_api.py DarkAgent.py darkgpt.py functions.py main.py /home/appuser/app/
 COPY --chown=appuser:appuser ./prompts/initialize_agent_prompt.txt /home/appuser/app/prompts/initialize_agent_prompt.txt
-COPY --chown=appuser:appuser prompts/metasploit_reconn_agent_prompt.txt /home/appuser/app/prompts/metasploit_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/metasploit_reconn_agent_prompt.txt /home/appuser/app/prompts/metasploit_reconn_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/metasploit_ports_services_vulns_agent_prompt.txt /home/appuser/app/prompts/metasploit_ports_services_vulns_agent_prompt.txt
+COPY --chown=appuser:appuser ./prompts/metasploit_ports_systems_services_agent_prompt.txt /home/appuser/app/prompts/metasploit_ports_systems_services_agent_prompt.txt
 COPY --chown=appuser:appuser ./prompts/ports_services_vulnerabilities_agent_prompt.txt /home/appuser/app/prompts/ports_services_vulnerabilities_agent_prompt.txt
 COPY --chown=appuser:appuser ./prompts/ports_system_services_agent_prompt.txt /home/appuser/app/prompts/ports_system_services_agent_prompt.txt
 COPY --chown=appuser:appuser ./prompts/recoinassance_agent_prompt.txt /home/appuser/app/prompts/recoinassance_agent_prompt.txt

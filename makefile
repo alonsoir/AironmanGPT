@@ -5,6 +5,7 @@ setup: requirements install_python install validate_python_libs
 container: container-build container-vulns size container-run
 
 container-non-bash: container-build-non-bash container-vulns-non-bash size container-run-non-bash
+
 code:
 	poetry run code .
 
