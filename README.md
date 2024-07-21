@@ -71,11 +71,40 @@ This guide will help you set up and run the project on your local environment.
    so i recommend you to use the following format, without double quotes:
 
 ```env
-   DEHASHED_API_KEY=your_dehashed_api_key_here
-   DEHASHED_USERNAME=your_dehashed_username
-   OPENAI_API_KEY=API_KEY from openai.com
-   GPT_MODEL_NAME=gpt-4-turbo-preview
+   OPENAI_API_KEY=YOUR_OPENAI_APIKEY
+   DEHASHED_API_KEY=""
+   DEHASHED_USERNAME=""
+   GPT_MODEL_NAME=gpt-3.5-turbo-0125
    GPT_MODEL_NAME_TEST=babbage-002
+   INTERFACE_TSHARK=en0
+   NMAP_OUTPUT_FILE=nmap_scan_results.xml
+   PCAP_OUTPUT_FILE=captura_trafico.pcap
+   # unnecessary, deprecated to be deleted
+   TARGET_NETWORK=127.0.0.1
+   INITIAL_WAIT_TIME=5
+   CAPTURE_DURATION=10
+   TEMPERATURE=1
+   MAX_TOKENS=4096
+   TIMEOUT=2
+   MAX_RETRIES=2
+   NGROK_AUTH_TOKEN=YOUR_NGROK_AUTH_TOKEN
+   # zeroday-api/premai-api/openai-api
+   DEFAULT_ENGINE=premai-api
+   PREMAI_API_KEY=YOUR_PREMAI_API_KEY
+   PREMAI_MODEL=remm-slerp-l2-13b
+   PREMAI_PROJECT_ID=540
+   PREMAI_TEMPERATURE=0.7
+   PREMAI_SESSION_ID="my-session"
+   PREMAI_SYSTEM_PROMPT="You are a helpful assistant."
+   TIKTOKEN_ENCODING=cl100k_base
+   USE_TSHARK=false
+   #deprecated
+   ZERODAY_API_KEY=YOUR_ZERODAY_API_KEY
+   POSTGRES_DB=msf
+   POSTGRES_USER=msf
+   POSTGRES_PASSWORD=msf_password
+   MSF_COMMAND_OSX=/opt/metasploit-framework/bin/msfconsole
+   MSF_COMMAND=/usr/bin/msfconsole
 ```
 
 4. **Install Dependencies**
